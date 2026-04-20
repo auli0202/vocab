@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Word Database</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 { font-size: 2.5rem; color: #0f172a; margin-bottom: 10px; }
+
+        .search-container {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            margin-bottom: 30px;
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 2px solid #e2e8f0;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        #searchBar:focus {
+            border-color: var(--primary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            border-left: 6px solid var(--primary);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .word-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 0 5px 0;
+            color: #0f172a;
+            text-transform: capitalize;
+        }
+
+        .family-tag {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .example-box {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            font-style: italic;
+            color: #475569;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .example-box::before {
+            content: "“";
+            font-size: 2rem;
+            color: #cbd5e1;
+            position: absolute;
+            top: -5px;
+            left: 5px;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 50px;
+            font-weight: bold;
+            color: #64748b;
+        }
+
+        @media (min-width: 640px) {
+            .grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Vocabulary Bank</h1>
+            <p>Live sync from your Google Sheet</p>
+        </header>
+
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="Search for a word or family..." onkeyup="filterWords()">
+        </div>
+
+        <div id="loader" class="loading-spinner">Loading your data...</div>
+        <div id="wordGrid" class="grid"></div>
+    </div>
+
+    <script>
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfhPdQ7koz1opAWnlOoI9ez820Fw9c82oTeTBJmSw904qj_SarbUIB9xdZEQTP-z1GGBT6GbxHcBWM/pub?gid=0&single=true&output=csv";
+
+        let allWords = [];
+
+        async function loadData() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const csvText = await response.text();
+                
+                // Parse CSV rows
+                const rows = csvText.split('\n').slice(1); // Remove header row
+                
+                allWords = rows.map(row => {
+                    // Regex to handle commas inside quotes in the Example column
+                    const parts = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    return {
+                        word: parts[0]?.replace(/"/g, '').trim(),
+                        family: parts[1]?.replace(/"/g, '').trim(),
+                        example: parts[2]?.replace(/"/g, '').trim()
+                    };
+                }).filter(item => item.word !== ""); // Don't show empty rows
+
+                document.getElementById('loader').style.display = 'none';
+                displayWords(allWords);
+            } catch (error) {
+                document.getElementById('loader').innerHTML = "⚠️ Error loading data. Make sure your sheet is published to the web.";
+                console.error(error);
+            }
+        }
+
+        function displayWords(data) {
+            const grid = document.getElementById('wordGrid');
+            grid.innerHTML = data.map(item => `
+                <div class="card">
+                    <h2 class="word-title">${item.word}</h2>
+                    <span class="family-tag">${item.family}</span>
+                    <div class="example-box">
+                        ${item.example}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterWords() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const filtered = allWords.filter(item => 
+                item.word.toLowerCase().includes(query) || 
+                item.family.toLowerCase().includes(query)
+            );
+            displayWords(filtered);
+        }
+
+        // Start the fetch
+        loadData();
+    </script>
+</body>
+</html>
