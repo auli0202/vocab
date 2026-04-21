@@ -3,200 +3,358 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Word Database</title>
+    <title>Lexicon Pro | Adaptive Modernist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2563eb;
-            --bg: #f8fafc;
-            --text: #1e293b;
+            --primary: #006a4e;        
+            --secondary: #4338ca;      
+            --bg: #f3f4f6;             
+            --glass: rgba(255, 255, 255, 0.85);
+            --text-main: #111827;      
+            --text-sub: #6b7280;
+            --word-size: 1.25rem;
+            --content-size: 0.9rem;
         }
 
         body { 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            font-family: 'Inter', 'Hind Siliguri', sans-serif; 
+            background-color: var(--bg); color: var(--text-main); margin: 0; padding: 0;
+            line-height: 1.5; -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            width: 100%;
-            max-width: 800px;
-        }
-
+        /* SMART ADAPTIVE HEADER */
         header {
-            text-align: center;
-            margin-bottom: 40px;
+            position: sticky; top: 0; z-index: 1000;
+            width: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 12px 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        h1 { font-size: 2.5rem; color: #0f172a; margin-bottom: 10px; }
-
-        .search-container {
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-            margin-bottom: 30px;
+        header.scrolled {
+            padding: 6px 0;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
+
+        .header-content { width: 94%; max-width: 850px; margin: 0 auto; }
+
+        .header-top { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 10px; 
+            transition: all 0.3s ease;
+            max-height: 50px; opacity: 1;
+        }
+        header.scrolled .header-top {
+            max-height: 0; opacity: 0; margin-bottom: 0; overflow: hidden;
+            pointer-events: none;
+        }
+
+        .logo { cursor: pointer; user-select: none; }
+        .logo h1 { font-size: 1.2rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
+        .logo span { color: var(--primary); }
+
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .stats-pill { background: #fff; padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; color: var(--text-sub); border: 1px solid #e5e7eb; }
+
+        .font-ctrl { display: flex; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+        .font-btn { border: none; background: none; padding: 4px 8px; cursor: pointer; font-size: 0.65rem; font-weight: 800; color: var(--text-sub); }
+        .font-btn:first-child { border-right: 1px solid #e5e7eb; }
+
+        /* SEARCH & FILTERS */
+        .search-container { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 6px; align-items: center; }
+        header.scrolled .search-container { gap: 4px; }
 
         #searchBar {
-            width: 100%;
-            padding: 15px 25px;
-            border-radius: 50px;
-            border: 2px solid #e2e8f0;
-            font-size: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            outline: none;
-            transition: border-color 0.2s;
+            width: 100%; padding: 10px 14px; border-radius: 12px;
+            border: 1px solid transparent; background: #fff;
+            font-size: 0.85rem; transition: 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.02); box-sizing: border-box;
+        }
+        header.scrolled #searchBar { padding: 8px 12px; font-size: 0.8rem; }
+        #searchBar:focus { outline: none; border-color: var(--primary); }
+
+        select { 
+            padding: 9px 4px; border-radius: 12px; border: 1px solid #e5e7eb; 
+            background: #fff; font-size: 0.75rem; font-weight: 600; cursor: pointer; width: 100%;
+        }
+        header.scrolled select { padding: 7px 2px; font-size: 0.7rem; }
+
+        .btn { border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.75rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .btn-primary { background: var(--primary); color: white; padding: 10px 14px; }
+        header.scrolled .btn-primary { padding: 8px 12px; font-size: 0.7rem; }
+        .btn-icon { background: #fff; padding: 10px; border: 1px solid #e5e7eb; min-width: 40px; }
+        header.scrolled .btn-icon { padding: 8px; min-width: 35px; }
+        .btn-icon.active { background: #eef2ff; color: var(--secondary); border-color: #c7d2fe; }
+
+        /* CONTENT */
+        .container { width: 92%; max-width: 800px; margin: 30px auto 100px auto; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+
+        /* CARDS */
+        .card { 
+            background: #fff; border-radius: 20px; padding: 22px; 
+            position: relative; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); }
+        .card.marked { border-right: 5px solid var(--secondary); }
+
+        .card-id { font-size: 0.65rem; font-weight: 800; color: var(--primary); opacity: 0.5; margin-bottom: 2px; display: block; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .card-word { font-size: var(--word-size); font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+        .card-pos { font-size: 0.7rem; color: var(--text-sub); font-weight: 500; text-transform: uppercase; margin-left: 6px;}
+        
+        .card-bangla { font-size: calc(var(--word-size) * 0.85); color: var(--secondary); font-weight: 600; margin: 6px 0; }
+        
+        /* FAMILY TAG (Increased Font) */
+        .card-family { 
+            font-size: 0.85rem; font-weight: 700; color: var(--primary); 
+            background: rgba(0,106,78,0.08); padding: 4px 12px; 
+            border-radius: 8px; display: inline-block; margin-bottom: 12px; 
         }
 
-        #searchBar:focus {
-            border-color: var(--primary);
-        }
+        .card-example { font-size: var(--content-size); color: #4b5563; line-height: 1.6; border-left: 2px solid #f3f4f6; padding-left: 14px; font-style: italic; }
+        
+        .card-footer { margin-top: 15px; display: flex; gap: 15px; border-top: 1px solid #f9fafb; padding-top: 12px; }
+        .footer-link { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); cursor: pointer; }
+        .footer-link:hover { color: var(--primary); }
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
+        /* PAGINATION */
+        .pagination { display: flex; justify-content: center; gap: 8px; margin: 40px 0; flex-wrap: wrap; }
+        .p-btn { min-width: 38px; height: 38px; border-radius: 12px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 0.85rem; font-weight: 700; }
+        .p-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-            border-left: 6px solid var(--primary);
-        }
+        /* FLASHCARD */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .flash-box { width: 100%; max-width: 320px; height: 420px; cursor: pointer; perspective: 1000px; }
+        .flash-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flash-box.flipped .flash-inner { transform: rotateY(180deg); }
+        .flash-front, .flash-back { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 28px; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .flash-back { transform: rotateY(180deg); border: 2px solid var(--secondary); }
 
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .word-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin: 0 0 5px 0;
-            color: #0f172a;
-            text-transform: capitalize;
-        }
-
-        .family-tag {
-            display: inline-block;
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .example-box {
-            background: #f1f5f9;
-            padding: 15px;
-            border-radius: 8px;
-            font-style: italic;
-            color: #475569;
-            line-height: 1.5;
-            position: relative;
-        }
-
-        .example-box::before {
-            content: "“";
-            font-size: 2rem;
-            color: #cbd5e1;
-            position: absolute;
-            top: -5px;
-            left: 5px;
-        }
-
-        .loading-spinner {
-            text-align: center;
-            padding: 50px;
-            font-weight: bold;
-            color: #64748b;
-        }
-
-        @media (min-width: 640px) {
-            .grid { grid-template-columns: 1fr 1fr; }
+        @media (max-width: 600px) {
+            header { padding: 8px 0; }
+            .search-container { grid-template-columns: 1fr 1fr; }
+            .search-input-wrapper { grid-column: span 2; }
+            .container { width: 100%; padding: 0 12px; box-sizing: border-box; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <h1>Vocabulary Bank</h1>
-            <p>Live sync from your Google Sheet</p>
-        </header>
-
-        <div class="search-container">
-            <input type="text" id="searchBar" placeholder="Search for a word or family..." onkeyup="filterWords()">
+    <header id="mainHeader">
+        <div class="header-content">
+            <div class="header-top">
+                <div class="logo" onclick="goHome()"><h1>Lexi<span>con.</span></h1></div>
+                <div class="header-actions">
+                    <div class="stats-pill" id="totalStats">0 | 0 ❤️</div>
+                    <div class="font-ctrl">
+                        <button class="font-btn" onclick="adjustFont(1)">A+</button>
+                        <button class="font-btn" onclick="adjustFont(-1)">A-</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="openFlashcard()">Practice</button>
+                </div>
+            </div>
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <input type="text" id="searchBar" placeholder="Find word, meaning, or #ID..." onkeyup="process()">
+                </div>
+                <select id="sortSelect" onchange="process()">
+                    <option value="newest">Newest</option>
+                    <option value="az">A-Z</option>
+                </select>
+                <select id="posFilter" onchange="process()">
+                    <option value="all">Types</option>
+                    <option value="noun">Noun</option>
+                    <option value="pronoun">Pronoun</option>
+                    <option value="verb">Verb</option>
+                    <option value="adjective">Adjective</option>
+                    <option value="adverb">Adverb</option>
+                    <option value="preposition">Preposition</option>
+                    <option value="conjunction">Conjunction</option>
+                    <option value="interjection">Interjection</option>
+                </select>
+                <button id="favToggle" class="btn btn-icon" onclick="toggleFav()">❤️</button>
+            </div>
         </div>
+    </header>
 
-        <div id="loader" class="loading-spinner">Loading your data...</div>
-        <div id="wordGrid" class="grid"></div>
+    <div class="container">
+        <div id="grid" class="grid"></div>
+        <div id="pagination" class="pagination"></div>
+    </div>
+
+    <!-- FLASHCARD -->
+    <div id="modal" class="modal">
+        <div style="text-align:center; width: 100%; display:flex; flex-direction:column; align-items:center;">
+            <div class="flash-box" id="flash" onclick="this.classList.toggle('flipped')">
+                <div class="flash-inner">
+                    <div class="flash-front">
+                        <span style="font-size: 0.65rem; color: var(--primary); font-weight: 800; letter-spacing: 1px;">VOCABULARY</span>
+                        <h1 id="f-word" style="font-size: 2.2rem; margin: 10px 0;">...</h1>
+                        <p id="f-pos" style="color: var(--text-sub); font-size: 0.85rem;"></p>
+                    </div>
+                    <div class="flash-back">
+                        <h2 id="f-bangla" style="color: var(--secondary); margin: 0 0 10px 0; font-size: 1.8rem;">...</h2>
+                        <p id="f-example" style="font-size: 0.85rem; font-style: italic; color: var(--text-sub); line-height: 1.5;"></p>
+                        <button class="btn btn-primary" style="margin-top:25px; width:100%;" onclick="event.stopPropagation(); nextFlash()">Next Word</button>
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeFlashcard()" style="margin-top:30px; background:none; border:none; color:#fff; cursor:pointer; font-weight:700; font-size: 0.8rem; letter-spacing: 1px;">CLOSE PRACTICE</button>
+        </div>
     </div>
 
     <script>
-        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfhPdQ7koz1opAWnlOoI9ez820Fw9c82oTeTBJmSw904qj_SarbUIB9xdZEQTP-z1GGBT6GbxHcBWM/pub?gid=0&single=true&output=csv";
+        const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfhPdQ7koz1opAWnlOoI9ez820Fw9c82oTeTBJmSw904qj_SarbUIB9xdZEQTP-z1GGBT6GbxHcBWM/pub?gid=0&single=true&output=csv";
+        
+        let all = [], filtered = [], marked = JSON.parse(localStorage.getItem('marked')) || [], onlyFav = false, page = 1;
+        let fontSizeLevel = 0;
 
-        let allWords = [];
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('mainHeader');
+            if (window.scrollY > 60) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+        });
 
-        async function loadData() {
+        async function init() {
             try {
-                const response = await fetch(SHEET_URL);
-                const csvText = await response.text();
-                
-                // Parse CSV rows
-                const rows = csvText.split('\n').slice(1); // Remove header row
-                
-                allWords = rows.map(row => {
-                    // Regex to handle commas inside quotes in the Example column
-                    const parts = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    return {
-                        word: parts[0]?.replace(/"/g, '').trim(),
-                        family: parts[1]?.replace(/"/g, '').trim(),
-                        example: parts[2]?.replace(/"/g, '').trim()
+                const res = await fetch(URL);
+                const csv = await res.text();
+                const rows = csv.split('\n').slice(1);
+                all = rows.map((r, i) => {
+                    const p = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    return { 
+                        id: i+1, 
+                        word: p[0]?.replace(/"/g, '').trim(), 
+                        family: p[1]?.replace(/"/g, '').trim(), 
+                        example: p[2]?.replace(/"/g, '').trim(), 
+                        bangla: p[3]?.replace(/"/g, '').trim(), 
+                        pos: p[4]?.replace(/"/g, '').trim() || "N/A"
                     };
-                }).filter(item => item.word !== ""); // Don't show empty rows
-
-                document.getElementById('loader').style.display = 'none';
-                displayWords(allWords);
-            } catch (error) {
-                document.getElementById('loader').innerHTML = "⚠️ Error loading data. Make sure your sheet is published to the web.";
-                console.error(error);
-            }
+                }).filter(x => x.word);
+                process();
+            } catch (e) { document.getElementById('grid').innerHTML = "<center>Check Sheet Connection.</center>"; }
         }
 
-        function displayWords(data) {
-            const grid = document.getElementById('wordGrid');
-            grid.innerHTML = data.map(item => `
-                <div class="card">
-                    <h2 class="word-title">${item.word}</h2>
-                    <span class="family-tag">${item.family}</span>
-                    <div class="example-box">
-                        ${item.example}
+        function adjustFont(delta) {
+            fontSizeLevel += delta;
+            if (fontSizeLevel > 4) fontSizeLevel = 4;
+            if (fontSizeLevel < -2) fontSizeLevel = -2;
+            const root = document.documentElement;
+            root.style.setProperty('--word-size', (1.25 + fontSizeLevel * 0.1) + 'rem');
+            root.style.setProperty('--content-size', (0.9 + fontSizeLevel * 0.05) + 'rem');
+        }
+
+        function goHome() {
+            document.getElementById('searchBar').value = "";
+            document.getElementById('sortSelect').value = "newest";
+            document.getElementById('posFilter').value = "all";
+            onlyFav = false;
+            document.getElementById('favToggle').classList.remove('active');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            process();
+        }
+
+        function process() {
+            const q = document.getElementById('searchBar').value.toLowerCase().trim();
+            const s = document.getElementById('sortSelect').value;
+            const posF = document.getElementById('posFilter').value.toLowerCase();
+            page = 1;
+            
+            filtered = all.filter(i => {
+                const matchesSearch = i.word.toLowerCase().includes(q) || i.bangla.includes(q) || i.id.toString() === q;
+                const matchesPos = posF === 'all' || i.pos.toLowerCase().includes(posF);
+                return matchesSearch && matchesPos;
+            });
+
+            if (onlyFav) filtered = filtered.filter(i => marked.includes(i.word));
+            if (s === "az") filtered.sort((a,b) => a.word.localeCompare(b.word));
+            else filtered.sort((a,b) => b.id - a.id);
+
+            document.getElementById('totalStats').innerText = `${filtered.length} | ${marked.length} ❤️`;
+            render();
+        }
+
+        function render() {
+            const start = (page - 1) * 30;
+            const slice = filtered.slice(start, start + 30);
+            const grid = document.getElementById('grid');
+            
+            if(slice.length === 0) {
+                grid.innerHTML = `<div style="text-align:center; padding:100px; color:var(--text-sub);">Nothing found.</div>`;
+                return;
+            }
+
+            grid.innerHTML = slice.map(item => `
+                <div class="card ${marked.includes(item.word) ? 'marked' : ''}">
+                    <span class="card-id">#${item.id}</span>
+                    <div class="card-header">
+                        <h2 class="card-word">${item.word}<span class="card-pos">(${item.pos})</span></h2>
+                        <span style="cursor:pointer; font-size:1.3rem; padding: 2px;" onclick="toggleMark('${item.word}')">${marked.includes(item.word) ? '❤️' : '🤍'}</span>
+                    </div>
+                    <div class="card-bangla">${item.bangla}</div>
+                    ${item.family && item.family !== "N/A" ? `<div class="card-family">${item.family}</div>` : ''}
+                    <div class="card-example">${item.example}</div>
+                    <div class="card-footer">
+                        <span class="footer-link" onclick="speak('${item.word}')">🔊 Listen</span>
+                        <span class="footer-link" onclick="copy('${item.word}')">📋 Copy</span>
                     </div>
                 </div>
             `).join('');
+            renderPag();
         }
 
-        function filterWords() {
-            const query = document.getElementById('searchBar').value.toLowerCase();
-            const filtered = allWords.filter(item => 
-                item.word.toLowerCase().includes(query) || 
-                item.family.toLowerCase().includes(query)
-            );
-            displayWords(filtered);
+        function renderPag() {
+            const total = Math.ceil(filtered.length / 30);
+            const nav = document.getElementById('pagination');
+            nav.innerHTML = "";
+            if (total <= 1) return;
+            for(let i=1; i<=total; i++){
+                const b = document.createElement('button');
+                b.className = `p-btn ${i === page ? 'active' : ''}`;
+                b.innerText = i;
+                b.onclick = () => { page = i; render(); window.scrollTo({top:0, behavior:'smooth'}); };
+                nav.appendChild(b);
+            }
         }
 
-        // Start the fetch
-        loadData();
+        function toggleMark(w) {
+            marked = marked.includes(w) ? marked.filter(x => x !== w) : [...marked, w];
+            localStorage.setItem('marked', JSON.stringify(marked));
+            process();
+        }
+
+        function toggleFav() {
+            onlyFav = !onlyFav;
+            document.getElementById('favToggle').classList.toggle('active');
+            process();
+        }
+
+        function openFlashcard() { 
+            if(filtered.length === 0) return;
+            document.getElementById('modal').style.display = 'flex'; 
+            nextFlash(); 
+        }
+        function closeFlashcard() { document.getElementById('modal').style.display = 'none'; }
+        function nextFlash() {
+            document.getElementById('flash').classList.remove('flipped');
+            const r = filtered[Math.floor(Math.random() * filtered.length)];
+            setTimeout(() => {
+                document.getElementById('f-word').innerText = r.word;
+                document.getElementById('f-pos').innerText = `(${r.pos})`;
+                document.getElementById('f-bangla').innerText = r.bangla;
+                document.getElementById('f-example').innerText = `"${r.example}"`;
+            }, 200);
+        }
+
+        function speak(t) { const s = new SpeechSynthesisUtterance(t); s.lang = 'en-US'; window.speechSynthesis.speak(s); }
+        function copy(t) { navigator.clipboard.writeText(t); alert("Copied!"); }
+
+        init();
     </script>
 </body>
 </html>
