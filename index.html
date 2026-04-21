@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>vocabHSC</title>
+    <title>vocabHSC | Pro Alignment</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #006a4e;        
-            --secondary: #4338ca;      
-            --bg: #f3f4f6;             
-            --glass: rgba(255, 255, 255, 0.85);
-            --text-main: #111827;      
-            --text-sub: #6b7280;
-            --word-size: 1.25rem;
-            --content-size: 0.9rem;
+            --primary: #006a4e; --secondary: #4338ca; --bg: #f8fafc;             
+            --text-main: #0f172a; --text-sub: #64748b;
+            --card-bg: #ffffff; --word-font: 1.25rem;
+            --header-h: 155px;
         }
 
         body { 
@@ -23,206 +19,198 @@
             line-height: 1.5; -webkit-font-smoothing: antialiased;
         }
 
-        /* ULTRA-THIN ADAPTIVE HEADER */
-        header {
-            position: sticky; top: 0; z-index: 1000;
-            width: 100%;
-            background: var(--glass);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding: 14px 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        /* UI PROTECTION */
+        .logo, .btn, .action-btn, .font-ctrl, .p-btn, .stats-pill, select, .card-id, .p-jump {
+            user-select: none; -webkit-user-select: none;
         }
 
-        /* The "Ultra-Thin" Scrolled State */
-        header.scrolled {
-            padding: 5px 0;
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        /* 1. MINI STICKY BAR (Centered Logo on Scroll) */
+        #miniBar {
+            position: fixed; top: -65px; left: 0; width: 100%; height: 42px;
+            background: #ffffff; border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2000; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
+        #miniBar.visible { top: 0; }
+        .mini-logo { font-size: 0.85rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
+        .mini-logo span { color: var(--primary); }
 
-        .header-content { width: 94%; max-width: 850px; margin: 0 auto; transition: all 0.3s; }
+        /* 2. MAIN HEADER */
+        .main-header { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 15px 0; width: 100%; }
+        .header-content { width: 92%; max-width: 800px; margin: 0 auto; }
+        
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        
+        /* LOGO */
+        .logo h1 { font-size: 1.6rem; font-weight: 800; margin: 0; letter-spacing: -1.5px; cursor: pointer; line-height: 1; }
+        .logo h1 span { color: var(--primary); }
 
-        .header-top { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 10px; transition: all 0.3s;
+        /* ACTION CLUSTER ALIGNMENT */
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        
+        .stats-pill { 
+            background: #f1f5f9; padding: 0 12px; border-radius: 10px; 
+            font-size: 0.7rem; font-weight: 800; color: var(--text-sub); 
+            border: 1px solid #e2e8f0; height: 36px; display: flex; align-items: center;
         }
+        
+        .font-ctrl { display: flex; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; height: 36px; }
+        .font-btn { border: none; background: none; padding: 0 10px; cursor: pointer; font-size: 0.7rem; font-weight: 800; color: var(--text-sub); height: 100%; display: flex; align-items: center; }
+        .font-btn:hover { color: var(--primary); background: #f8fafc; }
 
-        /* Hide everything except Logo on scroll */
-        header.scrolled .header-actions,
-        header.scrolled .search-container {
-            display: none;
+        .btn-practice { 
+            border: none; background: var(--primary); color: white; 
+            padding: 0 16px; border-radius: 10px; font-weight: 700; 
+            font-size: 0.75rem; cursor: pointer; height: 36px;
+            display: flex; align-items: center; transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0, 106, 78, 0.15);
         }
+        .btn-practice:active { transform: scale(0.96); }
 
-        header.scrolled .header-top {
-            margin-bottom: 0;
-            justify-content: center; /* Centers logo when thin */
-        }
+        /* TOOLBAR GRID */
+        .toolbar { display: grid; grid-template-columns: 2.5fr 1.2fr 1.2fr auto; gap: 8px; align-items: center; }
+        #searchBar { width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; font-size: 0.85rem; outline: none; box-sizing: border-box; }
+        select { padding: 9px; border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; font-size: 0.75rem; font-weight: 600; cursor: pointer; width: 100%; }
 
-        .logo { cursor: pointer; user-select: none; }
-        .logo h1 { font-size: 1.2rem; font-weight: 800; margin: 0; letter-spacing: -1px; transition: 0.3s; }
-        header.scrolled .logo h1 { font-size: 0.9rem; }
-        .logo span { color: var(--primary); }
-
-        .header-actions { display: flex; align-items: center; gap: 10px; }
-        .stats-pill { background: #fff; padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; color: var(--text-sub); border: 1px solid #e5e7eb; }
-
-        /* Reading Controls */
-        .font-ctrl { display: flex; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
-        .font-btn { border: none; background: none; padding: 4px 8px; cursor: pointer; font-size: 0.65rem; font-weight: 800; color: var(--text-sub); }
-        .font-btn:first-child { border-right: 1px solid #e5e7eb; }
-
-        /* Search area (Hidden on scroll) */
-        .search-container { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; align-items: center; }
-
-        #searchBar {
-            width: 100%; padding: 10px 14px; border-radius: 12px;
-            border: 1px solid #e5e7eb; background: #fff;
-            font-size: 0.85rem; outline: none; box-sizing: border-box;
-        }
-        #searchBar:focus { border-color: var(--primary); }
-
-        select { 
-            padding: 9px 4px; border-radius: 12px; border: 1px solid #e5e7eb; 
-            background: #fff; font-size: 0.75rem; font-weight: 600; cursor: pointer; width: 100%;
-        }
-
-        .btn { border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.75rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-        .btn-primary { background: var(--primary); color: white; padding: 10px 16px; }
-        .btn-icon { background: #fff; padding: 10px; border: 1px solid #e5e7eb; min-width: 42px; }
+        .btn-icon { border: 1px solid #e2e8f0; background: #fff; padding: 10px; border-radius: 12px; min-width: 42px; height: 42px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-icon.active { background: #eef2ff; color: var(--secondary); border-color: #c7d2fe; }
 
-        /* CONTENT */
-        .container { width: 92%; max-width: 800px; margin: 30px auto 100px auto; }
-        .grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        /* 3. CONTENT AREA */
+        .container { width: 92%; max-width: 800px; margin: 25px auto 50px auto; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
 
-        /* CARDS */
-        .card { 
-            background: #fff; border-radius: 20px; padding: 22px; 
-            position: relative; transition: 0.3s;
-            border: 1px solid rgba(0,0,0,0.02);
+        .card { background: var(--card-bg); border-radius: 24px; padding: 25px; border: 1px solid #e2e8f0; position: relative; }
+        .card.marked { border-right: 6px solid var(--secondary); }
+        .card-id { font-size: 0.55rem; font-weight: 800; color: var(--primary); opacity: 0.4; margin-bottom: 2px; display: block; letter-spacing: 0.5px; }
+
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .card-word { font-size: var(--word-font); font-weight: 800; margin: 0; letter-spacing: -0.5px; user-select: text; }
+        .card-word span { font-size: 0.7rem; font-weight: 400; opacity: 0.5; margin-left: 6px; }
+        
+        .card-bangla { font-size: calc(var(--word-font) * 0.9); color: var(--secondary); font-weight: 600; margin: 5px 0; user-select: text; }
+        .card-family { font-size: 0.95rem; font-weight: 700; color: var(--primary); background: #f0fdf4; padding: 6px 15px; border-radius: 10px; display: inline-block; margin-bottom: 12px; border: 1px solid #dcfce7; }
+        .card-example { font-size: 0.9rem; color: #4b5563; line-height: 1.6; border-left: 3px solid #f1f5f9; padding-left: 14px; font-style: italic; user-select: text; }
+        
+        .card-footer { margin-top: 18px; display: flex; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
+        .action-btn { display: flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; background: #f8fafc; color: var(--text-sub); border: 1px solid #e2e8f0; }
+        .btn-listen { color: var(--primary); background: #f0fdf4; }
+        .btn-google { color: #4285f4; background: #f0f7ff; }
+
+        /* 4. PAGINATION & JUMP */
+        .pagination-wrap { display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 40px 0; padding-bottom: 60px; }
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .p-btn { 
+            min-width: 40px; height: 40px; border-radius: 12px; border: 1px solid #e2e8f0; 
+            background: #fff; cursor: pointer; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
         }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.05); }
-        .card.marked { border-right: 5px solid var(--secondary); }
-
-        .card-id { font-size: 0.65rem; font-weight: 800; color: var(--primary); opacity: 0.5; margin-bottom: 2px; display: block; }
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-        .card-word { font-size: var(--word-size); font-weight: 800; margin: 0; letter-spacing: -0.5px; }
-        .card-pos { font-size: 0.7rem; color: var(--text-sub); font-weight: 500; text-transform: uppercase; margin-left: 6px;}
-        
-        .card-bangla { font-size: calc(var(--word-size) * 0.85); color: var(--secondary); font-weight: 600; margin: 6px 0; }
-        
-        /* Styled Family Word (No "Family:" text) */
-        .card-family { 
-            font-size: 0.88rem; font-weight: 700; color: var(--primary); 
-            background: rgba(0,106,78,0.08); padding: 4px 12px; 
-            border-radius: 8px; display: inline-block; margin-bottom: 12px; 
-        }
-
-        .card-example { font-size: var(--content-size); color: #4b5563; line-height: 1.6; border-left: 2px solid #f3f4f6; padding-left: 14px; font-style: italic; }
-        
-        .card-footer { margin-top: 15px; display: flex; gap: 15px; border-top: 1px solid #f9fafb; padding-top: 12px; }
-        .footer-link { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); cursor: pointer; transition: 0.2s; }
-        .footer-link:hover { color: var(--primary); }
-
-        /* PAGINATION */
-        .pagination { display: flex; justify-content: center; gap: 8px; margin: 40px 0; flex-wrap: wrap; }
-        .p-btn { min-width: 38px; height: 38px; border-radius: 12px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 0.85rem; font-weight: 700; }
         .p-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .p-btn.nav-btn { width: auto; padding: 0 12px; background: #f1f5f9; }
 
-        /* FLASHCARD MODAL */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
-        .flash-box { width: 100%; max-width: 320px; height: 420px; cursor: pointer; perspective: 1000px; }
-        .flash-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+        .p-jump { display: flex; align-items: center; gap: 8px; background: #fff; padding: 5px 10px; border-radius: 18px; border: 1px solid #e2e8f0; }
+        .p-jump input { width: 45px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; text-align: center; font-weight: 800; color: var(--primary); outline: none; }
+        .p-jump-btn { background: var(--primary); color: #fff; border: none; padding: 7px 15px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 3000; justify-content: center; align-items: center; }
+        .flash-box { width: 320px; height: 420px; cursor: pointer; perspective: 1000px; }
+        .flash-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
         .flash-box.flipped .flash-inner { transform: rotateY(180deg); }
-        .flash-front, .flash-back { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 28px; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .flash-front, .flash-back { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 30px; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
         .flash-back { transform: rotateY(180deg); border: 2px solid var(--secondary); }
 
         @media (max-width: 600px) {
-            header.scrolled { padding: 4px 0; }
-            .header-content { width: 92%; }
-            .search-container { grid-template-columns: 1fr 1fr; }
-            .search-input-wrapper { grid-column: span 2; }
-            .container { width: 100%; padding: 0 12px; box-sizing: border-box; }
+            .toolbar { grid-template-columns: 1fr 1fr; }
+            .header-top { flex-direction: row; }
+            .logo h1 { font-size: 1.3rem; }
+            .stats-pill, .font-ctrl { display: none; } /* Hide clutter on mobile header to fit Practice */
+            .header-anchor { height: 185px; }
         }
     </style>
 </head>
 <body>
 
-    <header id="mainHeader">
+    <div id="miniBar">
+        <div class="mini-logo" onclick="goHome()">VOCAB<span>HSC.</span></div>
+    </div>
+
+    <div class="main-header">
         <div class="header-content">
             <div class="header-top">
-                <div class="logo" onclick="goHome()"><h1>vocab<span>HSC</span></h1></div>
+                <div class="logo" onclick="goHome()"><h1>vocab<span>HSC.</span></h1></div>
                 <div class="header-actions">
-                    <div class="stats-pill" id="totalStats">0 | 0 ❤️</div>
+                    <div class="stats-pill" id="totalStats">...</div>
                     <div class="font-ctrl">
                         <button class="font-btn" onclick="adjustFont(1)">A+</button>
                         <button class="font-btn" onclick="adjustFont(-1)">A-</button>
                     </div>
-                    <button class="btn btn-primary" onclick="openFlashcard()">Practice</button>
+                    <button class="btn-practice" onclick="openFlashcard()">Practice Mode</button>
                 </div>
             </div>
-            <div class="search-container">
-                <div class="search-input-wrapper">
-                    <input type="text" id="searchBar" placeholder="Search word, meaning, or #ID..." onkeyup="process()">
-                </div>
+            <div class="toolbar">
+                <input type="text" id="searchBar" placeholder="Search word or #ID..." onkeyup="process()">
                 <select id="sortSelect" onchange="process()">
-                    <option value="newest">Newest</option>
-                    <option value="az">A-Z</option>
+                    <option value="id_asc">ID: Oldest (#1 First)</option>
+                    <option value="id_desc">ID: Newest (Last First)</option>
+                    <option value="az">A to Z</option>
+                    <option value="za">Z to A</option>
                 </select>
                 <select id="posFilter" onchange="process()">
-                    <option value="all">Types</option>
+                    <option value="all">All Parts of Speech</option>
                     <option value="noun">Noun</option>
-                    <option value="pronoun">Pronoun</option>
                     <option value="verb">Verb</option>
                     <option value="adjective">Adjective</option>
                     <option value="adverb">Adverb</option>
                     <option value="preposition">Preposition</option>
                     <option value="conjunction">Conjunction</option>
-                    <option value="interjection">Interjection</option>
                 </select>
-                <button id="favToggle" class="btn btn-icon" onclick="toggleFav()">❤️</button>
+                <button id="favToggle" class="btn-icon" onclick="toggleFav()">❤️</button>
             </div>
         </div>
-    </header>
+    </div>
 
     <div class="container">
         <div id="grid" class="grid"></div>
-        <div id="pagination" class="pagination"></div>
+        
+        <div class="pagination-wrap">
+            <div id="pagination" class="pagination"></div>
+            <div id="jumpArea" class="p-jump" style="display:none;">
+                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-sub);">Jump to:</span>
+                <input type="number" id="jumpInput" min="1" placeholder="Pg">
+                <button class="p-jump-btn" onclick="jumpToPage()">Go</button>
+            </div>
+        </div>
     </div>
 
-    <!-- FLASHCARD MODAL -->
     <div id="modal" class="modal">
         <div style="text-align:center; width: 100%; display:flex; flex-direction:column; align-items:center;">
             <div class="flash-box" id="flash" onclick="this.classList.toggle('flipped')">
                 <div class="flash-inner">
                     <div class="flash-front">
-                        <span style="font-size: 0.65rem; color: var(--primary); font-weight: 800; letter-spacing: 1px;">VOCABULARY</span>
+                        <span style="font-size: 0.65rem; color: var(--primary); font-weight: 800;">vocabHSC Practice</span>
                         <h1 id="f-word" style="font-size: 2.2rem; margin: 10px 0;">...</h1>
-                        <p id="f-pos" style="color: var(--text-sub); font-size: 0.85rem;"></p>
                     </div>
                     <div class="flash-back">
                         <h2 id="f-bangla" style="color: var(--secondary); margin: 0 0 10px 0; font-size: 1.8rem;">...</h2>
                         <p id="f-example" style="font-size: 0.85rem; font-style: italic; color: var(--text-sub); line-height: 1.5;"></p>
-                        <button class="btn btn-primary" style="margin-top:25px; width:100%;" onclick="event.stopPropagation(); nextFlash()">Next Word</button>
+                        <button class="btn-practice" style="margin-top:25px; width:100%; justify-content:center" onclick="event.stopPropagation(); nextFlash()">Next Word</button>
                     </div>
                 </div>
             </div>
-            <button onclick="closeFlashcard()" style="margin-top:30px; background:none; border:none; color:#fff; cursor:pointer; font-weight:700; font-size: 0.8rem; letter-spacing: 1px;">CLOSE SESSION</button>
+            <button onclick="closeFlashcard()" style="margin-top:30px; background:none; border:none; color:#fff; cursor:pointer; font-weight:700; font-size: 0.8rem;">CLOSE</button>
         </div>
     </div>
 
     <script>
         const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfhPdQ7koz1opAWnlOoI9ez820Fw9c82oTeTBJmSw904qj_SarbUIB9xdZEQTP-z1GGBT6GbxHcBWM/pub?gid=0&single=true&output=csv";
         
-        let all = [], filtered = [], marked = JSON.parse(localStorage.getItem('marked')) || [], onlyFav = false, page = 1;
-        let fontSizeLevel = 0;
+        let all = [], filtered = [], marked = JSON.parse(localStorage.getItem('marked_hsc_v7')) || [], onlyFav = false, page = 1;
+        const perPage = 10;
 
-        // SCROLL OBSERVER for ULTRA-THIN HEADER
         window.addEventListener('scroll', () => {
-            const header = document.getElementById('mainHeader');
-            if (window.scrollY > 40) header.classList.add('scrolled');
-            else header.classList.remove('scrolled');
+            const mini = document.getElementById('miniBar');
+            if (window.scrollY > 160) mini.classList.add('visible');
+            else mini.classList.remove('visible');
         });
 
         async function init() {
@@ -232,132 +220,157 @@
                 const rows = csv.split('\n').slice(1);
                 all = rows.map((r, i) => {
                     const p = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    return { 
-                        id: i+1, 
-                        word: p[0]?.replace(/"/g, '').trim(), 
-                        family: p[1]?.replace(/"/g, '').trim(), 
-                        example: p[2]?.replace(/"/g, '').trim(), 
-                        bangla: p[3]?.replace(/"/g, '').trim(), 
-                        pos: p[4]?.replace(/"/g, '').trim() || "N/A"
-                    };
+                    return { id: i+1, word: p[0]?.replace(/"/g, '').trim(), family: p[1]?.replace(/"/g, '').trim(), example: p[2]?.replace(/"/g, '').trim(), bangla: p[3]?.replace(/"/g, '').trim(), pos: p[4]?.replace(/"/g, '').trim() || "N/A" };
                 }).filter(x => x.word);
                 process();
-            } catch (e) { document.getElementById('grid').innerHTML = "<center>Check Sheet Connection.</center>"; }
+            } catch (e) { document.getElementById('grid').innerHTML = "<center>Check Sheet link.</center>"; }
         }
 
         function adjustFont(delta) {
-            fontSizeLevel += delta;
-            if (fontSizeLevel > 4) fontSizeLevel = 4;
-            if (fontSizeLevel < -2) fontSizeLevel = -2;
-            const root = document.documentElement;
-            root.style.setProperty('--word-size', (1.25 + fontSizeLevel * 0.1) + 'rem');
-            root.style.setProperty('--content-size', (0.9 + fontSizeLevel * 0.05) + 'rem');
-        }
-
-        function goHome() {
-            document.getElementById('searchBar').value = "";
-            document.getElementById('sortSelect').value = "newest";
-            document.getElementById('posFilter').value = "all";
-            onlyFav = false;
-            document.getElementById('favToggle').classList.remove('active');
-            window.scrollTo({top: 0, behavior: 'smooth'});
-            process();
+            let current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--word-font'));
+            document.documentElement.style.setProperty('--word-font', (current + (delta * 0.1)) + 'rem');
         }
 
         function process() {
             const q = document.getElementById('searchBar').value.toLowerCase().trim();
-            const s = document.getElementById('sortSelect').value;
+            const sortVal = document.getElementById('sortSelect').value;
             const posF = document.getElementById('posFilter').value.toLowerCase();
-            page = 1;
             
+            // Note: We don't reset page to 1 automatically here to allow sorting within the same page context if desired, 
+            // however, for search/filter, it's standard to reset.
+            if(q !== "" || posF !== "all") page = 1;
+
             filtered = all.filter(i => {
-                const matchesSearch = i.word.toLowerCase().includes(q) || i.bangla.includes(q) || i.id.toString() === q;
-                const matchesPos = posF === 'all' || i.pos.toLowerCase().includes(posF);
-                return matchesSearch && matchesPos;
+                const mSearch = i.word.toLowerCase().includes(q) || i.bangla.includes(q) || i.id.toString() === q;
+                const mPos = posF === 'all' || i.pos.toLowerCase().includes(posF);
+                return mSearch && mPos;
             });
 
             if (onlyFav) filtered = filtered.filter(i => marked.includes(i.word));
-            if (s === "az") filtered.sort((a,b) => a.word.localeCompare(b.word));
-            else filtered.sort((a,b) => b.id - a.id);
+
+            // Sorting Logic
+            if (sortVal === "az") filtered.sort((a,b) => a.word.localeCompare(b.word));
+            else if (sortVal === "za") filtered.sort((a,b) => b.word.localeCompare(a.word));
+            else if (sortVal === "id_asc") filtered.sort((a,b) => a.id - b.id);
+            else if (sortVal === "id_desc") filtered.sort((a,b) => b.id - a.id);
 
             document.getElementById('totalStats').innerText = `${filtered.length} | ${marked.length} ❤️`;
             render();
         }
 
         function render() {
-            const start = (page - 1) * 30;
-            const slice = filtered.slice(start, start + 30);
+            const start = (page - 1) * perPage;
+            const slice = filtered.slice(start, start + perPage);
             const grid = document.getElementById('grid');
             
-            if(slice.length === 0) {
-                grid.innerHTML = `<div style="text-align:center; padding:100px; color:var(--text-sub); font-weight:600;">Nothing found.</div>`;
-                return;
-            }
-
-            grid.innerHTML = slice.map(item => `
-                <div class="card ${marked.includes(item.word) ? 'marked' : ''}">
+            grid.innerHTML = slice.map(item => {
+                const isMarked = marked.includes(item.word);
+                const wordSafe = item.word.replace(/'/g, "\\'");
+                return `
+                <div class="card ${isMarked ? 'marked' : ''}">
                     <span class="card-id">#${item.id}</span>
                     <div class="card-header">
-                        <h2 class="card-word">${item.word}<span class="card-pos">(${item.pos})</span></h2>
-                        <span style="cursor:pointer; font-size:1.3rem; padding: 2px;" onclick="toggleMark('${item.word}')">${marked.includes(item.word) ? '❤️' : '🤍'}</span>
+                        <h2 class="card-word">${item.word}<span>(${item.pos})</span></h2>
+                        <span style="cursor:pointer; font-size:1.3rem; padding: 5px;" onclick="toggleMark('${wordSafe}')">
+                            ${isMarked ? '❤️' : '🤍'}
+                        </span>
                     </div>
                     <div class="card-bangla">${item.bangla}</div>
                     ${item.family && item.family !== "N/A" ? `<div class="card-family">${item.family}</div>` : ''}
                     <div class="card-example">${item.example}</div>
                     <div class="card-footer">
-                        <span class="footer-link" onclick="speak('${item.word}')">🔊 Listen</span>
-                        <span class="footer-link" onclick="copy('${item.word}')">📋 Copy</span>
+                        <div class="action-btn btn-listen" onclick="speak('${wordSafe}')">🔊 Listen</div>
+                        <div class="action-btn btn-google" onclick="window.open('https://www.google.com/search?q=${encodeURIComponent(item.word)}+meaning+in+Bangla', '_blank')">🌐 Search</div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
             renderPag();
         }
 
         function renderPag() {
-            const total = Math.ceil(filtered.length / 30);
+            const totalPages = Math.ceil(filtered.length / perPage);
             const nav = document.getElementById('pagination');
+            const jumpArea = document.getElementById('jumpArea');
             nav.innerHTML = "";
-            if (total <= 1) return;
-            for(let i=1; i<=total; i++){
+            
+            if (totalPages <= 1) { jumpArea.style.display = 'none'; return; }
+            jumpArea.style.display = 'flex';
+
+            const createBtn = (p, label, active = false) => {
                 const b = document.createElement('button');
-                b.className = `p-btn ${i === page ? 'active' : ''}`;
-                b.innerText = i;
-                b.onclick = () => { page = i; render(); window.scrollTo({top:0, behavior:'smooth'}); };
-                nav.appendChild(b);
+                b.className = `p-btn ${active ? 'active' : ''}`;
+                b.innerText = label;
+                b.onclick = () => { page = p; render(); window.scrollTo({top:0, behavior:'smooth'}); };
+                return b;
+            };
+
+            if (page > 1) {
+                const prev = createBtn(page - 1, 'Prev');
+                prev.classList.add('nav-btn');
+                nav.appendChild(prev);
+            }
+
+            if (totalPages <= 5) {
+                for (let i = 1; i <= totalPages; i++) nav.appendChild(createBtn(i, i, i === page));
+            } else {
+                nav.appendChild(createBtn(1, 1, 1 === page));
+                if (page > 3) nav.appendChild(Object.assign(document.createElement('span'), {innerText:'...', style:'padding:0 5px;font-weight:bold'}));
+                
+                let start = Math.max(2, page - 1);
+                let end = Math.min(totalPages - 1, page + 1);
+                for (let i = start; i <= end; i++) nav.appendChild(createBtn(i, i, i === page));
+
+                if (page < totalPages - 2) nav.appendChild(Object.assign(document.createElement('span'), {innerText:'...', style:'padding:0 5px;font-weight:bold'}));
+                nav.appendChild(createBtn(totalPages, totalPages, totalPages === page));
+            }
+
+            if (page < totalPages) {
+                const next = createBtn(page + 1, 'Next');
+                next.classList.add('nav-btn');
+                nav.appendChild(next);
             }
         }
 
+        function jumpToPage() {
+            const input = document.getElementById('jumpInput');
+            const val = parseInt(input.value);
+            const totalPages = Math.ceil(filtered.length / perPage);
+            if (val >= 1 && val <= totalPages) {
+                page = val; render(); window.scrollTo({top:0, behavior:'smooth'});
+                input.value = "";
+            } else { alert(`Enter 1 to ${totalPages}`); }
+        }
+
         function toggleMark(w) {
-            marked = marked.includes(w) ? marked.filter(x => x !== w) : [...marked, w];
-            localStorage.setItem('marked', JSON.stringify(marked));
-            process();
+            if (marked.includes(w)) marked = marked.filter(x => x !== w);
+            else marked.push(w);
+            localStorage.setItem('marked_hsc_v7', JSON.stringify(marked));
+            render();
+            document.getElementById('totalStats').innerText = `${filtered.length} | ${marked.length} ❤️`;
         }
 
-        function toggleFav() {
-            onlyFav = !onlyFav;
-            document.getElementById('favToggle').classList.toggle('active');
-            process();
-        }
+        function toggleFav() { onlyFav = !onlyFav; document.getElementById('favToggle').classList.toggle('active'); process(); }
 
-        function openFlashcard() { 
-            if(filtered.length === 0) return;
-            document.getElementById('modal').style.display = 'flex'; 
-            nextFlash(); 
-        }
+        function openFlashcard() { if(filtered.length === 0) return; document.getElementById('modal').style.display = 'flex'; nextFlash(); }
         function closeFlashcard() { document.getElementById('modal').style.display = 'none'; }
         function nextFlash() {
             document.getElementById('flash').classList.remove('flipped');
             const r = filtered[Math.floor(Math.random() * filtered.length)];
             setTimeout(() => {
                 document.getElementById('f-word').innerText = r.word;
-                document.getElementById('f-pos').innerText = `(${r.pos})`;
                 document.getElementById('f-bangla').innerText = r.bangla;
-                document.getElementById('f-example').innerText = `"${r.example}"`;
+                document.getElementById('f-example').innerText = r.example;
             }, 200);
         }
 
-        function speak(t) { const s = new SpeechSynthesisUtterance(t); s.lang = 'en-US'; window.speechSynthesis.speak(s); }
-        function copy(t) { navigator.clipboard.writeText(t); alert("Copied!"); }
+        function speak(t) {
+            window.speechSynthesis.cancel();
+            const m = new SpeechSynthesisUtterance(t);
+            m.lang = 'en-US'; m.rate = 0.9;
+            window.speechSynthesis.speak(m);
+        }
+
+        function goHome() { window.scrollTo({top: 0, behavior: 'smooth'}); setTimeout(() => location.reload(), 300); }
 
         init();
     </script>
