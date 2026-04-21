@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lexicon Pro | Adaptive Modernist</title>
+    <title>Lexicon Pro | Ultra-Thin Adaptive</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -23,70 +23,73 @@
             line-height: 1.5; -webkit-font-smoothing: antialiased;
         }
 
-        /* SMART ADAPTIVE HEADER */
+        /* ULTRA-THIN ADAPTIVE HEADER */
         header {
             position: sticky; top: 0; z-index: 1000;
             width: 100%;
             background: var(--glass);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding: 12px 0;
+            padding: 14px 0;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* The "Ultra-Thin" Scrolled State */
         header.scrolled {
-            padding: 6px 0;
+            padding: 5px 0;
             background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
 
-        .header-content { width: 94%; max-width: 850px; margin: 0 auto; }
+        .header-content { width: 94%; max-width: 850px; margin: 0 auto; transition: all 0.3s; }
 
         .header-top { 
             display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 10px; 
-            transition: all 0.3s ease;
-            max-height: 50px; opacity: 1;
+            margin-bottom: 10px; transition: all 0.3s;
         }
+
+        /* Hide everything except Logo on scroll */
+        header.scrolled .header-actions,
+        header.scrolled .search-container {
+            display: none;
+        }
+
         header.scrolled .header-top {
-            max-height: 0; opacity: 0; margin-bottom: 0; overflow: hidden;
-            pointer-events: none;
+            margin-bottom: 0;
+            justify-content: center; /* Centers logo when thin */
         }
 
         .logo { cursor: pointer; user-select: none; }
-        .logo h1 { font-size: 1.2rem; font-weight: 800; margin: 0; letter-spacing: -1px; }
+        .logo h1 { font-size: 1.2rem; font-weight: 800; margin: 0; letter-spacing: -1px; transition: 0.3s; }
+        header.scrolled .logo h1 { font-size: 0.9rem; }
         .logo span { color: var(--primary); }
 
-        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .header-actions { display: flex; align-items: center; gap: 10px; }
         .stats-pill { background: #fff; padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; color: var(--text-sub); border: 1px solid #e5e7eb; }
 
+        /* Reading Controls */
         .font-ctrl { display: flex; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
         .font-btn { border: none; background: none; padding: 4px 8px; cursor: pointer; font-size: 0.65rem; font-weight: 800; color: var(--text-sub); }
         .font-btn:first-child { border-right: 1px solid #e5e7eb; }
 
-        /* SEARCH & FILTERS */
-        .search-container { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 6px; align-items: center; }
-        header.scrolled .search-container { gap: 4px; }
+        /* Search area (Hidden on scroll) */
+        .search-container { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; align-items: center; }
 
         #searchBar {
             width: 100%; padding: 10px 14px; border-radius: 12px;
-            border: 1px solid transparent; background: #fff;
-            font-size: 0.85rem; transition: 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.02); box-sizing: border-box;
+            border: 1px solid #e5e7eb; background: #fff;
+            font-size: 0.85rem; outline: none; box-sizing: border-box;
         }
-        header.scrolled #searchBar { padding: 8px 12px; font-size: 0.8rem; }
-        #searchBar:focus { outline: none; border-color: var(--primary); }
+        #searchBar:focus { border-color: var(--primary); }
 
         select { 
             padding: 9px 4px; border-radius: 12px; border: 1px solid #e5e7eb; 
             background: #fff; font-size: 0.75rem; font-weight: 600; cursor: pointer; width: 100%;
         }
-        header.scrolled select { padding: 7px 2px; font-size: 0.7rem; }
 
         .btn { border: none; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 0.75rem; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-        .btn-primary { background: var(--primary); color: white; padding: 10px 14px; }
-        header.scrolled .btn-primary { padding: 8px 12px; font-size: 0.7rem; }
-        .btn-icon { background: #fff; padding: 10px; border: 1px solid #e5e7eb; min-width: 40px; }
-        header.scrolled .btn-icon { padding: 8px; min-width: 35px; }
+        .btn-primary { background: var(--primary); color: white; padding: 10px 16px; }
+        .btn-icon { background: #fff; padding: 10px; border: 1px solid #e5e7eb; min-width: 42px; }
         .btn-icon.active { background: #eef2ff; color: var(--secondary); border-color: #c7d2fe; }
 
         /* CONTENT */
@@ -96,10 +99,10 @@
         /* CARDS */
         .card { 
             background: #fff; border-radius: 20px; padding: 22px; 
-            position: relative; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative; transition: 0.3s;
             border: 1px solid rgba(0,0,0,0.02);
         }
-        .card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.05); }
         .card.marked { border-right: 5px solid var(--secondary); }
 
         .card-id { font-size: 0.65rem; font-weight: 800; color: var(--primary); opacity: 0.5; margin-bottom: 2px; display: block; }
@@ -109,9 +112,9 @@
         
         .card-bangla { font-size: calc(var(--word-size) * 0.85); color: var(--secondary); font-weight: 600; margin: 6px 0; }
         
-        /* FAMILY TAG (Increased Font) */
+        /* Styled Family Word (No "Family:" text) */
         .card-family { 
-            font-size: 0.85rem; font-weight: 700; color: var(--primary); 
+            font-size: 0.88rem; font-weight: 700; color: var(--primary); 
             background: rgba(0,106,78,0.08); padding: 4px 12px; 
             border-radius: 8px; display: inline-block; margin-bottom: 12px; 
         }
@@ -119,7 +122,7 @@
         .card-example { font-size: var(--content-size); color: #4b5563; line-height: 1.6; border-left: 2px solid #f3f4f6; padding-left: 14px; font-style: italic; }
         
         .card-footer { margin-top: 15px; display: flex; gap: 15px; border-top: 1px solid #f9fafb; padding-top: 12px; }
-        .footer-link { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); cursor: pointer; }
+        .footer-link { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); cursor: pointer; transition: 0.2s; }
         .footer-link:hover { color: var(--primary); }
 
         /* PAGINATION */
@@ -127,7 +130,7 @@
         .p-btn { min-width: 38px; height: 38px; border-radius: 12px; border: 1px solid #e5e7eb; background: #fff; cursor: pointer; font-size: 0.85rem; font-weight: 700; }
         .p-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-        /* FLASHCARD */
+        /* FLASHCARD MODAL */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
         .flash-box { width: 100%; max-width: 320px; height: 420px; cursor: pointer; perspective: 1000px; }
         .flash-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
@@ -136,7 +139,8 @@
         .flash-back { transform: rotateY(180deg); border: 2px solid var(--secondary); }
 
         @media (max-width: 600px) {
-            header { padding: 8px 0; }
+            header.scrolled { padding: 4px 0; }
+            .header-content { width: 92%; }
             .search-container { grid-template-columns: 1fr 1fr; }
             .search-input-wrapper { grid-column: span 2; }
             .container { width: 100%; padding: 0 12px; box-sizing: border-box; }
@@ -148,7 +152,7 @@
     <header id="mainHeader">
         <div class="header-content">
             <div class="header-top">
-                <div class="logo" onclick="goHome()"><h1>Lexi<span>con.</span></h1></div>
+                <div class="logo" onclick="goHome()"><h1>vocab<span>HSC.</span></h1></div>
                 <div class="header-actions">
                     <div class="stats-pill" id="totalStats">0 | 0 ❤️</div>
                     <div class="font-ctrl">
@@ -160,7 +164,7 @@
             </div>
             <div class="search-container">
                 <div class="search-input-wrapper">
-                    <input type="text" id="searchBar" placeholder="Find word, meaning, or #ID..." onkeyup="process()">
+                    <input type="text" id="searchBar" placeholder="Search word, meaning, or #ID..." onkeyup="process()">
                 </div>
                 <select id="sortSelect" onchange="process()">
                     <option value="newest">Newest</option>
@@ -187,7 +191,7 @@
         <div id="pagination" class="pagination"></div>
     </div>
 
-    <!-- FLASHCARD -->
+    <!-- FLASHCARD MODAL -->
     <div id="modal" class="modal">
         <div style="text-align:center; width: 100%; display:flex; flex-direction:column; align-items:center;">
             <div class="flash-box" id="flash" onclick="this.classList.toggle('flipped')">
@@ -204,7 +208,7 @@
                     </div>
                 </div>
             </div>
-            <button onclick="closeFlashcard()" style="margin-top:30px; background:none; border:none; color:#fff; cursor:pointer; font-weight:700; font-size: 0.8rem; letter-spacing: 1px;">CLOSE PRACTICE</button>
+            <button onclick="closeFlashcard()" style="margin-top:30px; background:none; border:none; color:#fff; cursor:pointer; font-weight:700; font-size: 0.8rem; letter-spacing: 1px;">CLOSE SESSION</button>
         </div>
     </div>
 
@@ -214,9 +218,10 @@
         let all = [], filtered = [], marked = JSON.parse(localStorage.getItem('marked')) || [], onlyFav = false, page = 1;
         let fontSizeLevel = 0;
 
+        // SCROLL OBSERVER for ULTRA-THIN HEADER
         window.addEventListener('scroll', () => {
             const header = document.getElementById('mainHeader');
-            if (window.scrollY > 60) header.classList.add('scrolled');
+            if (window.scrollY > 40) header.classList.add('scrolled');
             else header.classList.remove('scrolled');
         });
 
@@ -285,7 +290,7 @@
             const grid = document.getElementById('grid');
             
             if(slice.length === 0) {
-                grid.innerHTML = `<div style="text-align:center; padding:100px; color:var(--text-sub);">Nothing found.</div>`;
+                grid.innerHTML = `<div style="text-align:center; padding:100px; color:var(--text-sub); font-weight:600;">Nothing found.</div>`;
                 return;
             }
 
