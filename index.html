@@ -2,377 +2,1063 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>vocabHSC | Pro Alignment</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>vocabHSC • Smart Cards • MCQ Arena • Full Screen • Haptic • Image Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         :root {
-            --primary: #006a4e; --secondary: #4338ca; --bg: #f8fafc;             
-            --text-main: #0f172a; --text-sub: #64748b;
-            --card-bg: #ffffff; --word-font: 1.25rem;
-            --header-h: 155px;
+            --primary: #006a4e;
+            --primary-dark: #004d38;
+            --primary-light: #e0f2e9;
+            --secondary: #2c5282;
+            --secondary-soft: #ebf4ff;
+            --accent: #e67e22;
+            --bg: #f9fbfd;
+            --surface: #ffffff;
+            --text-main: #0a1c2f;
+            --text-soft: #2d3e5f;
+            --border: #e2edf2;
+            --radius-card: 24px;
+            --f-scale: 1;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.03);
+            --transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
 
-        body { 
-            font-family: 'Inter', 'Hind Siliguri', sans-serif; 
-            background-color: var(--bg); color: var(--text-main); margin: 0; padding: 0;
-            line-height: 1.5; -webkit-font-smoothing: antialiased;
+        body {
+            font-family: 'Inter', 'Hind Siliguri', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding-top: 190px;
+            line-height: 1.45;
+            font-weight: 450;
         }
 
-        /* UI PROTECTION */
-        .logo, .btn, .action-btn, .font-ctrl, .p-btn, .stats-pill, select, .card-id, .p-jump {
-            user-select: none; -webkit-user-select: none;
+        /* Utility to lock body scroll */
+        body.modal-open {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
 
-        /* 1. MINI STICKY BAR (Centered Logo on Scroll) */
-        #miniBar {
-            position: fixed; top: -65px; left: 0; width: 100%; height: 42px;
-            background: #ffffff; border-bottom: 1px solid #e2e8f0;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 2000; transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 5000;
+            background: #e9edf2;
         }
-        #miniBar.visible { top: 0; }
-        .mini-logo { font-size: 0.85rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
-        .mini-logo span { color: var(--primary); }
+        #masteryFill {
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            transition: width 0.4s ease;
+        }
+        .scroll-progress {
+            position: fixed;
+            top: 4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 0, 0, 0.05);
+            z-index: 5001;
+        }
+        #scrollProgressFill {
+            width: 0%;
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.08s linear;
+        }
 
-        /* 2. MAIN HEADER */
-        .main-header { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 15px 0; width: 100%; }
-        .header-content { width: 92%; max-width: 800px; margin: 0 auto; }
+        #mainHeader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            z-index: 4000;
+            transition: transform 0.3s ease-out;
+            padding: 12px 0 14px;
+        }
+        .header-hidden {
+            transform: translateY(-100%);
+        }
+        .header-inner {
+            width: 92%;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .logo h1 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #0a2b1e;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .logo span {
+            color: var(--primary);
+        }
+        .stats-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 5px 14px;
+            border-radius: 60px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .stats-group:active {
+            transform: scale(0.96);
+            background: #f1f5f9;
+        }
+        .stat-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .menu-toggle {
+            font-size: 1.8rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+        .search-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+        #searchBar {
+            flex: 2;
+            min-width: 140px;
+            padding: 12px 18px;
+            border-radius: 48px;
+            border: 1px solid var(--border);
+            background: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        #searchBar:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 106, 78, 0.1);
+        }
+        .sort-fav-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        #sortSelect {
+            padding: 0 14px;
+            height: 46px;
+            border-radius: 48px;
+            border: 1px solid var(--border);
+            background: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .btn-fav {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 48px;
+            padding: 0 18px;
+            height: 46px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-fav.active {
+            background: #fff0f5;
+            border-color: #f3b3c2;
+            color: #b91c3b;
+        }
+        .pos-tabs {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: thin;
+            -webkit-overflow-scrolling: touch;
+        }
+        .pos-tab {
+            padding: 7px 18px;
+            border-radius: 60px;
+            background: white;
+            border: 1px solid var(--border);
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .pos-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .container {
+            width: 92%;
+            max-width: 760px;
+            margin: 20px auto 110px auto;
+        }
+        .grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-card);
+            padding: 20px 18px;
+            border: 1px solid var(--border);
+            position: relative;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .card:active {
+            transform: scale(0.99);
+        }
+        .card.marked {
+            border-right: 5px solid var(--secondary);
+            background: #fefcfa;
+        }
+        .card.learned {
+            border-left: 5px solid var(--primary);
+            background: #f6fef9;
+        }
+        .card-icons {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 12px;
+        }
+        .icon-btn {
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            padding: 6px;
+            border-radius: 50%;
+            transition: var(--transition);
+            line-height: 1;
+        }
+        .icon-btn:active {
+            background: #eef2f6;
+            transform: scale(0.88);
+        }
+        .card-id {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+        .card-word {
+            font-size: calc(1.6rem * var(--f-scale));
+            font-weight: 800;
+            margin: 0 0 8px 0;
+            padding-right: 70px;
+            word-break: break-word;
+        }
+        .card-bangla {
+            font-size: calc(1.25rem * var(--f-scale));
+            color: var(--secondary);
+            font-weight: 650;
+            margin: 6px 0 10px;
+        }
+        .card-family {
+            font-size: calc(0.85rem * var(--f-scale));
+            font-weight: 700;
+            background: var(--primary-light);
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 60px;
+            margin-bottom: 12px;
+        }
+        .card-example {
+            font-size: calc(0.9rem * var(--f-scale));
+            color: #2c415c;
+            border-left: 3px solid #cbdde9;
+            padding-left: 14px;
+            margin-top: 8px;
+        }
+        .card-footer {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-top: 1px solid #eef3f8;
+            padding-top: 16px;
+        }
+        .action-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 16px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-main);
+        }
+        .action-icon:active {
+            transform: scale(0.94);
+            background: #eef2f6;
+        }
+        .btn-listen { background: #eff6ff; color: #1e4a76; }
+        .btn-translate { background: #fff7eb; color: #b45309; }
+        .btn-image { background: #e6f7ec; color: #2d6a4f; }
+
+        .font-dock {
+            position: fixed;
+            bottom: 20px;
+            right: 16px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: opacity 0.25s, transform 0.25s;
+        }
+        .scrolling-down .font-dock {
+            opacity: 0;
+            transform: translateY(28px);
+            pointer-events: none;
+        }
+        .float-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 32px;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            font-weight: 800;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            color: var(--primary);
+            transition: var(--transition);
+        }
+        .pagination {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin: 32px 0 18px;
+        }
+        .p-btn {
+            min-width: 44px;
+            height: 44px;
+            border-radius: 40px;
+            background: white;
+            border: 1px solid var(--border);
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .p-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        .p-jump {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: white;
+            padding: 6px 20px;
+            border-radius: 80px;
+            width: fit-content;
+            margin: 0 auto 20px;
+            border: 1px solid var(--border);
+        }
         
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-        
-        /* LOGO */
-        .logo h1 { font-size: 1.6rem; font-weight: 800; margin: 0; letter-spacing: -1.5px; cursor: pointer; line-height: 1; }
-        .logo h1 span { color: var(--primary); }
-
-        /* ACTION CLUSTER ALIGNMENT */
-        .header-actions { display: flex; align-items: center; gap: 8px; }
-        
-        .stats-pill { 
-            background: #f1f5f9; padding: 0 12px; border-radius: 10px; 
-            font-size: 0.7rem; font-weight: 800; color: var(--text-sub); 
-            border: 1px solid #e2e8f0; height: 36px; display: flex; align-items: center;
+        /* FULL SCREEN MODALS */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 6000;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .modal-box {
+            background: white;
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            border-radius: 0;
+            padding: 20px 20px 28px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            animation: fadeUp 0.2s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: translateY(0);}
         }
         
-        .font-ctrl { display: flex; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; height: 36px; }
-        .font-btn { border: none; background: none; padding: 0 10px; cursor: pointer; font-size: 0.7rem; font-weight: 800; color: var(--text-sub); height: 100%; display: flex; align-items: center; }
-        .font-btn:hover { color: var(--primary); background: #f8fafc; }
-
-        .btn-practice { 
-            border: none; background: var(--primary); color: white; 
-            padding: 0 16px; border-radius: 10px; font-weight: 700; 
-            font-size: 0.75rem; cursor: pointer; height: 36px;
-            display: flex; align-items: center; transition: 0.2s;
-            box-shadow: 0 2px 6px rgba(0, 106, 78, 0.15);
+        /* Flashcard inner fixed height, no scroll */
+        .flash-card-inner {
+            cursor: pointer;
+            height: 320px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #ffffff;
+            border-radius: 40px;
+            padding: 32px 20px;
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,106,78,0.2);
+            margin: 16px 0 20px;
+            transition: transform 0.1s ease;
+            word-break: break-word;
         }
-        .btn-practice:active { transform: scale(0.96); }
-
-        /* TOOLBAR GRID */
-        .toolbar { display: grid; grid-template-columns: 2.5fr 1.2fr 1.2fr auto; gap: 8px; align-items: center; }
-        #searchBar { width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; font-size: 0.85rem; outline: none; box-sizing: border-box; }
-        select { padding: 9px; border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; font-size: 0.75rem; font-weight: 600; cursor: pointer; width: 100%; }
-
-        .btn-icon { border: 1px solid #e2e8f0; background: #fff; padding: 10px; border-radius: 12px; min-width: 42px; height: 42px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .btn-icon.active { background: #eef2ff; color: var(--secondary); border-color: #c7d2fe; }
-
-        /* 3. CONTENT AREA */
-        .container { width: 92%; max-width: 800px; margin: 25px auto 50px auto; }
-        .grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
-
-        .card { background: var(--card-bg); border-radius: 24px; padding: 25px; border: 1px solid #e2e8f0; position: relative; }
-        .card.marked { border-right: 6px solid var(--secondary); }
-        .card-id { font-size: 0.55rem; font-weight: 800; color: var(--primary); opacity: 0.4; margin-bottom: 2px; display: block; letter-spacing: 0.5px; }
-
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .card-word { font-size: var(--word-font); font-weight: 800; margin: 0; letter-spacing: -0.5px; user-select: text; }
-        .card-word span { font-size: 0.7rem; font-weight: 400; opacity: 0.5; margin-left: 6px; }
-        
-        .card-bangla { font-size: calc(var(--word-font) * 0.9); color: var(--secondary); font-weight: 600; margin: 5px 0; user-select: text; }
-        .card-family { font-size: 0.95rem; font-weight: 700; color: var(--primary); background: #f0fdf4; padding: 6px 15px; border-radius: 10px; display: inline-block; margin-bottom: 12px; border: 1px solid #dcfce7; }
-        .card-example { font-size: 0.9rem; color: #4b5563; line-height: 1.6; border-left: 3px solid #f1f5f9; padding-left: 14px; font-style: italic; user-select: text; }
-        
-        .card-footer { margin-top: 18px; display: flex; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 15px; }
-        .action-btn { display: flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; background: #f8fafc; color: var(--text-sub); border: 1px solid #e2e8f0; }
-        .btn-listen { color: var(--primary); background: #f0fdf4; }
-        .btn-google { color: #4285f4; background: #f0f7ff; }
-
-        /* 4. PAGINATION & JUMP */
-        .pagination-wrap { display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 40px 0; padding-bottom: 60px; }
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .p-btn { 
-            min-width: 40px; height: 40px; border-radius: 12px; border: 1px solid #e2e8f0; 
-            background: #fff; cursor: pointer; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+        .flash-card-inner:active { transform: scale(0.98); }
+        .streak-badge {
+            background: var(--accent);
+            color: white;
+            padding: 6px 18px;
+            border-radius: 60px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: inline-block;
         }
-        .p-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .p-btn.nav-btn { width: auto; padding: 0 12px; background: #f1f5f9; }
-
-        .p-jump { display: flex; align-items: center; gap: 8px; background: #fff; padding: 5px 10px; border-radius: 18px; border: 1px solid #e2e8f0; }
-        .p-jump input { width: 45px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; text-align: center; font-weight: 800; color: var(--primary); outline: none; }
-        .p-jump-btn { background: var(--primary); color: #fff; border: none; padding: 7px 15px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
-
-        /* MODAL */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 3000; justify-content: center; align-items: center; }
-        .flash-box { width: 320px; height: 420px; cursor: pointer; perspective: 1000px; }
-        .flash-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
-        .flash-box.flipped .flash-inner { transform: rotateY(180deg); }
-        .flash-front, .flash-back { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 30px; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
-        .flash-back { transform: rotateY(180deg); border: 2px solid var(--secondary); }
-
-        @media (max-width: 600px) {
-            .toolbar { grid-template-columns: 1fr 1fr; }
-            .header-top { flex-direction: row; }
-            .logo h1 { font-size: 1.3rem; }
-            .stats-pill, .font-ctrl { display: none; } /* Hide clutter on mobile header to fit Practice */
-            .header-anchor { height: 185px; }
+        #f-word {
+            font-weight: 800;
+            margin: 16px 0 12px;
+            word-break: break-word;
+            line-height: 1.3;
+            transition: font-size 0.05s linear;
         }
+        #f-sub {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            word-break: break-word;
+        }
+        .quiz-option {
+            width: 100%;
+            padding: 16px 18px;
+            margin: 12px 0;
+            border-radius: 80px;
+            background: white;
+            border: 2px solid var(--border);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.1s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .quiz-option.correct {
+            background: var(--primary) !important;
+            color: white;
+            border-color: var(--primary);
+        }
+        .quiz-option.wrong {
+            background: #ffe9e9 !important;
+            color: #a12a2a;
+            border-color: #ffc9c9;
+        }
+        #quizProgressBar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 12px;
+            margin: 12px 0 20px;
+        }
+        #sideMenu {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 270px;
+            height: 100dvh;
+            background: white;
+            z-index: 7000;
+            transition: 0.3s cubic-bezier(0.2, 0.9, 0.4, 1);
+            padding: 40px 20px;
+            box-shadow: -8px 0 36px rgba(0, 0, 0, 0.08);
+        }
+        #sideMenu.active { right: 0; }
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 6900;
+            display: none;
+            backdrop-filter: blur(3px);
+        }
+        .menu-item {
+            padding: 16px 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 32px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .menu-item:active {
+            background: #f1f5f9;
+            transform: scale(0.96);
+        }
+        @media (max-width: 620px) {
+            body { padding-top: 210px; }
+            .card { padding: 18px 16px; }
+            .action-icon { padding: 8px 14px; font-size: 0.85rem; }
+            .card-word { font-size: calc(1.4rem * var(--f-scale)); }
+            .search-row { flex-direction: column; align-items: stretch; }
+            .sort-fav-group { justify-content: space-between; }
+            .btn-fav, #sortSelect { flex: 1; justify-content: center; }
+            .flash-card-inner { height: 280px; padding: 24px 16px; }
+        }
+        /* PC hover effects */
+        @media (hover: hover) {
+            .action-icon:hover, .p-btn:hover, .pos-tab:hover, .set-count-btn:hover {
+                transform: translateY(-2px);
+                background: #f1f5f9;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            }
+            .card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
+            }
+        }
+        .no-data { text-align: center; padding: 48px 20px; background: white; border-radius: 48px; color: #5e6f8d; }
+        .flash-nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; justify-content: center; }
+        .auto-speak-btn { background: #e6f7ec; border-color: #a5d6a5; }
+        .auto-speak-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .mastered-flash-btn.active-mastered { background: var(--primary) !important; color: white; border-color: var(--primary); }
+        .shuffle-btn { background: #f3e8ff; border-color: #d8b4fe; }
+        .custom-count-input { width: 70px; text-align: center; font-weight: 600; border-radius: 40px; border: 1px solid var(--border); padding: 6px 0; font-size: 0.8rem; }
+        .set-count-btn { background: #eef2ff; border: 1px solid #cbdde9; padding: 6px 12px; border-radius: 40px; font-weight: 600; font-size: 0.75rem; cursor: pointer; }
+        .modal-box .action-icon { font-size: 0.9rem; padding: 10px 18px; }
+        #q-word { font-size: 2rem; margin: 16px 0; }
     </style>
 </head>
 <body>
 
-    <div id="miniBar">
-        <div class="mini-logo" onclick="goHome()">VOCAB<span>HSC.</span></div>
+<div class="progress-container"><div id="masteryFill"></div></div>
+<div class="scroll-progress"><div id="scrollProgressFill"></div></div>
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+<nav id="sideMenu">
+    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 36px;">
+        <div class="logo"><h1>vocab<span>HSC.</span></h1></div>
+        <div style="font-size: 2rem; cursor:pointer;" onclick="toggleMenu()">×</div>
     </div>
+    <div class="menu-item" onclick="resetToHomeLibrary(); toggleMenu()">📚 Home Library</div>
+    <div class="menu-item" onclick="openFlashcards(); toggleMenu()">⚡ Smart Cards</div>
+    <div class="menu-item" onclick="openQuiz(); toggleMenu()">🎯 MCQ Arena</div>
+    <div class="menu-item" onclick="toggleFavMode(); toggleMenu()">❤️ Bookmarked Words</div>
+    <div class="menu-item" onclick="resetAllData(); toggleMenu()">🔄 Reset Progress</div>
+</nav>
+<div class="font-dock" id="fontDock">
+    <button class="float-btn" onclick="adjustFont(0.1)">A+</button>
+    <button class="float-btn" onclick="adjustFont(-0.1)">A-</button>
+</div>
 
-    <div class="main-header">
-        <div class="header-content">
-            <div class="header-top">
-                <div class="logo" onclick="goHome()"><h1>vocab<span>HSC.</span></h1></div>
-                <div class="header-actions">
-                    <div class="stats-pill" id="totalStats">...</div>
-                    <div class="font-ctrl">
-                        <button class="font-btn" onclick="adjustFont(1)">A+</button>
-                        <button class="font-btn" onclick="adjustFont(-1)">A-</button>
-                    </div>
-                    <button class="btn-practice" onclick="openFlashcard()">Practice Mode</button>
+<header id="mainHeader">
+    <div class="header-inner">
+        <div class="header-top">
+            <div class="logo" onclick="resetToHomeLibrary()"><h1>vocab<span>HSC.</span></h1></div>
+            <div class="stats-group" onclick="toggleFavMode()">
+                <div class="stat-badge">📚 <span id="totalWordsCount">0</span></div>
+                <div class="stat-badge">❤️ <span id="markedWordsCount">0</span></div>
+                <div class="menu-toggle" onclick="event.stopPropagation(); toggleMenu()">☰</div>
+            </div>
+        </div>
+        <div class="search-filters">
+            <div class="search-row">
+                <input type="text" id="searchBar" placeholder="Search word, #ID or বাংলা..." onkeyup="debouncedProcess()" onkeypress="handleSearchEnter(event)">
+                <div class="sort-fav-group">
+                    <select id="sortSelect" onchange="processFiltersAndRender()">
+                        <option value="id_asc">ID ↑</option>
+                        <option value="id_desc">ID ↓</option>
+                        <option value="az">A → Z</option>
+                    </select>
+                    <button id="favToggleBtn" class="btn-fav" onclick="toggleFavMode()">❤️ Bookmark</button>
                 </div>
             </div>
-            <div class="toolbar">
-                <input type="text" id="searchBar" placeholder="Search word or #ID..." onkeyup="process()">
-                <select id="sortSelect" onchange="process()">
-                    <option value="id_asc">ID: Oldest (#1 First)</option>
-                    <option value="id_desc">ID: Newest (Last First)</option>
-                    <option value="az">A to Z</option>
-                    <option value="za">Z to A</option>
-                </select>
-                <select id="posFilter" onchange="process()">
-                    <option value="all">All Parts of Speech</option>
-                    <option value="noun">Noun</option>
-                    <option value="verb">Verb</option>
-                    <option value="adjective">Adjective</option>
-                    <option value="adverb">Adverb</option>
-                    <option value="preposition">Preposition</option>
-                    <option value="conjunction">Conjunction</option>
-                </select>
-                <button id="favToggle" class="btn-icon" onclick="toggleFav()">❤️</button>
-            </div>
+            <div class="pos-tabs" id="posTabsContainer"></div>
         </div>
     </div>
+</header>
 
-    <div class="container">
-        <div id="grid" class="grid"></div>
-        
-        <div class="pagination-wrap">
-            <div id="pagination" class="pagination"></div>
-            <div id="jumpArea" class="p-jump" style="display:none;">
-                <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-sub);">Jump to:</span>
-                <input type="number" id="jumpInput" min="1" placeholder="Pg">
-                <button class="p-jump-btn" onclick="jumpToPage()">Go</button>
-            </div>
-        </div>
-    </div>
+<div class="container">
+    <div id="grid" class="grid"></div>
+    <div id="pagination" class="pagination"></div>
+    <div id="jumpArea" class="p-jump" style="display: none;"><span>🔍 Jump to page</span><input type="number" id="jumpInput" min="1" placeholder="Pg" onkeypress="handleJumpEnter(event)"><button class="p-btn" style="padding:0 18px;" onclick="jumpToPage()">Go</button></div>
+</div>
 
-    <div id="modal" class="modal">
-        <div style="text-align:center; width: 100%; display:flex; flex-direction:column; align-items:center;">
-            <div class="flash-box" id="flash" onclick="this.classList.toggle('flipped')">
-                <div class="flash-inner">
-                    <div class="flash-front">
-                        <span style="font-size: 0.65rem; color: var(--primary); font-weight: 800;">vocabHSC Practice</span>
-                        <h1 id="f-word" style="font-size: 2.2rem; margin: 10px 0;">...</h1>
-                    </div>
-                    <div class="flash-back">
-                        <h2 id="f-bangla" style="color: var(--secondary); margin: 0 0 10px 0; font-size: 1.8rem;">...</h2>
-                        <p id="f-example" style="font-size: 0.85rem; font-style: italic; color: var(--text-sub); line-height: 1.5;"></p>
-                        <button class="btn-practice" style="margin-top:25px; width:100%; justify-content:center" onclick="event.stopPropagation(); nextFlash()">Next Word</button>
-                    </div>
+<!-- FLASHCARD MODAL: FULL SCREEN -->
+<div id="flashModal" class="modal">
+    <div class="modal-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap:wrap; gap:8px; margin-bottom: 8px;">
+            <div class="streak-badge">🔥 Smart Cards</div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap:wrap;">
+                <div style="display: flex; gap: 6px; align-items: center;">
+                    <input type="number" id="customCardCount" class="custom-count-input" min="1" value="20" onkeypress="handleCardCountEnter(event)">
+                    <button class="set-count-btn" onclick="setCustomCardCount(); haptic();">Set</button>
                 </div>
+                <button id="shuffleSessionBtn" class="action-icon shuffle-btn" style="padding:6px 12px;" onclick="shuffleFlashSession(); haptic();">🔀 Shuffle</button>
+                <button id="autoSpeakToggle" class="action-icon auto-speak-btn" style="padding:6px 12px;" onclick="toggleAutoSpeak(); haptic();">🔇 Auto OFF</button>
+                <div id="flashCounter" class="flash-progress-text" style="background:#eef2ff; padding:5px 12px; border-radius:40px;">0/20</div>
             </div>
-            <button onclick="closeFlashcard()" style="margin-top:30px; background:none; border:none; color:#fff; cursor:pointer; font-weight:700; font-size: 0.8rem;">CLOSE</button>
+        </div>
+        <div class="flash-card-inner" onclick="flipFlash(); haptic();">
+            <span id="f-label" style="font-size:0.7rem; font-weight:800; color:var(--primary);">📖 WORD</span>
+            <h2 id="f-word" style="margin: 16px 0;">...</h2>
+            <p id="f-sub" style="color:var(--text-sub); font-size:0.9rem;">👇 Tap to reveal meaning</p>
+        </div>
+        <div style="margin-top: 12px; display: flex; gap: 12px;">
+            <button class="action-icon" id="prevFlashBtn" style="flex:1;" onclick="previousFlash(); haptic();">◀ Prev</button>
+            <button class="action-icon" id="nextFlashBtn" style="flex:1; background:var(--primary); color:white; border:none;" onclick="nextFlash(); haptic();">Next ▶</button>
+        </div>
+        <div class="flash-nav">
+            <button class="action-icon btn-listen" onclick="speakFlash(); haptic();">🔊 Listen</button>
+            <button class="action-icon btn-image" onclick="openGoogleImageSearch(flashCurrent?.word); haptic();">🖼️ Image</button>
+            <button class="action-icon btn-translate" onclick="window.open('https://www.google.com/search?q='+encodeURIComponent(flashCurrent?.word)+'+meaning+in+Bangla','_blank'); haptic();">🌐 Translate</button>
+            <button class="action-icon" id="flashMarkBtn" onclick="toggleMarkFromFlash(); haptic();">🤍 Bookmark</button>
+            <button class="action-icon mastered-flash-btn" id="flashMasterBtn" onclick="toggleMasteredFromFlash(); haptic();">✅ Mastered</button>
+        </div>
+        <button onclick="closeModal('flashModal'); haptic();" style="margin-top: 20px; background:#f1f5f9; border:none; padding:12px 20px; border-radius:60px; font-weight:600; cursor:pointer;">Exit Session</button>
+    </div>
+</div>
+
+<!-- MCQ ARENA: FULL SCREEN -->
+<div id="quizModal" class="modal">
+    <div class="modal-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap:wrap;">
+            <div class="streak-badge" style="background: var(--secondary);">🏆 MCQ ARENA</div>
+            <div id="quizScore" style="font-weight:800; background:#eef2ff; padding:6px 16px; border-radius:40px;">Score: 0</div>
+        </div>
+        <div id="quizProgressBar"><div id="quizProgressFill" style="width:0%; height:100%; background: var(--primary); border-radius:12px;"></div></div>
+        <h2 id="q-word" style="font-size: 2rem; margin: 20px 0 16px;">...</h2>
+        <div id="q-options" style="margin: 20px 0;"></div>
+        <div id="quizFeedback" style="font-size: 0.9rem; min-height: 55px;"></div>
+        <div style="display: flex; gap: 14px; justify-content: center; margin-top: 20px;">
+            <button onclick="resetCurrentQuiz(); haptic();" class="action-icon" style="background:#f1f5f9;">⟳ Retry Arena</button>
+            <button onclick="closeModal('quizModal'); haptic();" class="action-icon">Exit</button>
         </div>
     </div>
+</div>
 
-    <script>
-        const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfhPdQ7koz1opAWnlOoI9ez820Fw9c82oTeTBJmSw904qj_SarbUIB9xdZEQTP-z1GGBT6GbxHcBWM/pub?gid=0&single=true&output=csv";
-        
-        let all = [], filtered = [], marked = JSON.parse(localStorage.getItem('marked_hsc_v7')) || [], onlyFav = false, page = 1;
-        const perPage = 10;
+<script>
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQfhPdQ7koz1opAWnlOoI9ez820Fw9c82oTeTBJmSw904qj_SarbUIB9xdZEQTP-z1GGBT6GbxHcBWM/pub?gid=0&single=true&output=csv";
+    
+    let masterDataset = [], activeFiltered = [], currentPage = 1, currentPosFilter = 'all', onlyFavActive = false;
+    let markedWords = JSON.parse(localStorage.getItem('hsc_marked_vFinal')) || [];
+    let learnedWords = JSON.parse(localStorage.getItem('hsc_mastered_vFinal')) || [];
+    
+    // Smart cards session
+    let flashSessionCards = [];
+    let flashIndex = 0;
+    let flashCurrent = null;
+    let isFlippedState = false;
+    let autoSpeakEnabled = false;
+    let currentCardCount = 20;
+    
+    // Quiz
+    let quizQuestions = [], quizIndex = 0, quizTotalScore = 0, quizLocked = false, currentQuizSet = [];
+    
+    let lastScroll = 0;
 
-        window.addEventListener('scroll', () => {
-            const mini = document.getElementById('miniBar');
-            if (window.scrollY > 160) mini.classList.add('visible');
-            else mini.classList.remove('visible');
+    // HAPTIC with longer duration
+    function haptic(ms = 20) {
+        if (window.navigator && window.navigator.vibrate) {
+            window.navigator.vibrate(ms);
+        }
+    }
+    function hapticSuccess() {
+        if (window.navigator && window.navigator.vibrate) window.navigator.vibrate([20, 15, 20]);
+    }
+    function hapticMedium() {
+        if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(30);
+    }
+
+    // LOCK / UNLOCK BODY SCROLL
+    function lockBodyScroll() { document.body.classList.add('modal-open'); }
+    function unlockBodyScroll() { document.body.classList.remove('modal-open'); }
+
+    // Google Image Search
+    function openGoogleImageSearch(word) {
+        if (!word) return;
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(word)}+word+meaning+illustration&tbm=isch`, '_blank');
+        haptic();
+    }
+
+    // Enter key handlers
+    function handleSearchEnter(event) { if (event.key === 'Enter') { event.preventDefault(); processFiltersAndRender(); haptic(); } }
+    function handleJumpEnter(event) { if (event.key === 'Enter') { event.preventDefault(); jumpToPage(); } }
+    function handleCardCountEnter(event) { if (event.key === 'Enter') { event.preventDefault(); setCustomCardCount(); } }
+
+    function speakWord(word) {
+        if (!word) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // ---- LIBRARY FUNCTIONS ----
+    function resetToHomeLibrary() {
+        document.getElementById('searchBar').value = '';
+        currentPosFilter = 'all';
+        onlyFavActive = false;
+        document.getElementById('favToggleBtn').classList.remove('active');
+        document.querySelectorAll('.pos-tab').forEach(tab => {
+            if (tab.innerText.toLowerCase() === 'all') tab.classList.add('active');
+            else tab.classList.remove('active');
         });
+        document.getElementById('sortSelect').value = 'id_asc';
+        currentPage = 1;
+        processFiltersAndRender();
+        haptic();
+    }
 
-        async function init() {
-            try {
-                const res = await fetch(URL);
-                const csv = await res.text();
-                const rows = csv.split('\n').slice(1);
-                all = rows.map((r, i) => {
-                    const p = r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    return { id: i+1, word: p[0]?.replace(/"/g, '').trim(), family: p[1]?.replace(/"/g, '').trim(), example: p[2]?.replace(/"/g, '').trim(), bangla: p[3]?.replace(/"/g, '').trim(), pos: p[4]?.replace(/"/g, '').trim() || "N/A" };
-                }).filter(x => x.word);
-                process();
-            } catch (e) { document.getElementById('grid').innerHTML = "<center>Check Sheet link.</center>"; }
+    function toggleFavMode() {
+        onlyFavActive = !onlyFavActive;
+        const btn = document.getElementById('favToggleBtn');
+        if (onlyFavActive) btn.classList.add('active');
+        else btn.classList.remove('active');
+        if (onlyFavActive) {
+            currentPosFilter = 'all';
+            document.querySelectorAll('.pos-tab').forEach(t => t.classList.remove('active'));
+            const allTab = [...document.querySelectorAll('.pos-tab')].find(t => t.innerText.toLowerCase() === 'all');
+            if (allTab) allTab.classList.add('active');
+        } else {
+            const activeTab = [...document.querySelectorAll('.pos-tab')].find(t => t.innerText.toLowerCase() === currentPosFilter);
+            if (activeTab) activeTab.classList.add('active');
         }
+        currentPage = 1;
+        processFiltersAndRender();
+        haptic();
+    }
 
-        function adjustFont(delta) {
-            let current = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--word-font'));
-            document.documentElement.style.setProperty('--word-font', (current + (delta * 0.1)) + 'rem');
-        }
-
-        function process() {
-            const q = document.getElementById('searchBar').value.toLowerCase().trim();
-            const sortVal = document.getElementById('sortSelect').value;
-            const posF = document.getElementById('posFilter').value.toLowerCase();
-            
-            // Note: We don't reset page to 1 automatically here to allow sorting within the same page context if desired, 
-            // however, for search/filter, it's standard to reset.
-            if(q !== "" || posF !== "all") page = 1;
-
-            filtered = all.filter(i => {
-                const mSearch = i.word.toLowerCase().includes(q) || i.bangla.includes(q) || i.id.toString() === q;
-                const mPos = posF === 'all' || i.pos.toLowerCase().includes(posF);
-                return mSearch && mPos;
+    async function fetchVocabulary() {
+        try {
+            const resp = await fetch(CSV_URL);
+            const text = await resp.text();
+            const rows = text.split('\n').slice(1);
+            masterDataset = rows.map((row, idx) => {
+                const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                return {
+                    id: idx+1,
+                    word: (cols[0]||'').replace(/"/g,'').trim(),
+                    family: (cols[1]||'').replace(/"/g,'').trim(),
+                    example: (cols[2]||'').replace(/"/g,'').trim(),
+                    bangla: (cols[3]||'').replace(/"/g,'').trim(),
+                    pos: (cols[4]||'').replace(/"/g,'').trim() || "N/A"
+                };
+            }).filter(x => x.word);
+            buildPosTabs();
+            updateHeaderStats();
+            processFiltersAndRender();
+            window.addEventListener('scroll', () => {
+                updateScrollProgress();
+                const header = document.getElementById('mainHeader');
+                if (window.scrollY > lastScroll && window.scrollY > 80) header.classList.add('header-hidden');
+                else header.classList.remove('header-hidden');
+                if (window.scrollY > 70) document.body.classList.add('scrolling-down');
+                else document.body.classList.remove('scrolling-down');
+                lastScroll = window.scrollY;
             });
-
-            if (onlyFav) filtered = filtered.filter(i => marked.includes(i.word));
-
-            // Sorting Logic
-            if (sortVal === "az") filtered.sort((a,b) => a.word.localeCompare(b.word));
-            else if (sortVal === "za") filtered.sort((a,b) => b.word.localeCompare(a.word));
-            else if (sortVal === "id_asc") filtered.sort((a,b) => a.id - b.id);
-            else if (sortVal === "id_desc") filtered.sort((a,b) => b.id - a.id);
-
-            document.getElementById('totalStats').innerText = `${filtered.length} | ${marked.length} ❤️`;
-            render();
+        } catch(e) {
+            document.getElementById('grid').innerHTML = `<div class="no-data">⚠️ Network issue. Refresh.</div>`;
         }
+    }
 
-        function render() {
-            const start = (page - 1) * perPage;
-            const slice = filtered.slice(start, start + perPage);
-            const grid = document.getElementById('grid');
-            
-            grid.innerHTML = slice.map(item => {
-                const isMarked = marked.includes(item.word);
-                const wordSafe = item.word.replace(/'/g, "\\'");
-                return `
-                <div class="card ${isMarked ? 'marked' : ''}">
-                    <span class="card-id">#${item.id}</span>
-                    <div class="card-header">
-                        <h2 class="card-word">${item.word}<span>(${item.pos})</span></h2>
-                        <span style="cursor:pointer; font-size:1.3rem; padding: 5px;" onclick="toggleMark('${wordSafe}')">
-                            ${isMarked ? '❤️' : '🤍'}
-                        </span>
-                    </div>
-                    <div class="card-bangla">${item.bangla}</div>
-                    ${item.family && item.family !== "N/A" ? `<div class="card-family">${item.family}</div>` : ''}
-                    <div class="card-example">${item.example}</div>
-                    <div class="card-footer">
-                        <div class="action-btn btn-listen" onclick="speak('${wordSafe}')">🔊 Listen</div>
-                        <div class="action-btn btn-google" onclick="window.open('https://www.google.com/search?q=${encodeURIComponent(item.word)}+meaning+in+Bangla', '_blank')">🌐 Search</div>
-                    </div>
+    function buildPosTabs() {
+        const list = ['all','noun','pronoun','adjective','verb','adverb','preposition','conjunction','interjection'];
+        const cont = document.getElementById('posTabsContainer');
+        cont.innerHTML = '';
+        list.forEach(p => {
+            const tab = document.createElement('div');
+            tab.className = `pos-tab ${p === 'all' ? 'active' : ''}`;
+            tab.innerText = p === 'all' ? 'All' : p.charAt(0).toUpperCase()+p.slice(1);
+            tab.onclick = () => { setPosFilter(p, tab); haptic(); };
+            cont.appendChild(tab);
+        });
+    }
+
+    function setPosFilter(pos, tab) {
+        currentPosFilter = pos;
+        onlyFavActive = false;
+        document.getElementById('favToggleBtn').classList.remove('active');
+        document.querySelectorAll('.pos-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentPage = 1;
+        processFiltersAndRender();
+    }
+
+    function processFiltersAndRender() {
+        let q = document.getElementById('searchBar').value.toLowerCase().trim();
+        let temp = [...masterDataset];
+        if (q) temp = temp.filter(i => i.word.toLowerCase().includes(q) || i.bangla.includes(q) || i.id.toString() === q);
+        if (currentPosFilter !== 'all') temp = temp.filter(i => i.pos.toLowerCase() === currentPosFilter.toLowerCase());
+        if (onlyFavActive) temp = temp.filter(i => markedWords.includes(i.word));
+        const sortVal = document.getElementById('sortSelect').value;
+        if (sortVal === 'az') temp.sort((a,b) => a.word.localeCompare(b.word));
+        else if (sortVal === 'id_desc') temp.sort((a,b) => b.id - a.id);
+        else temp.sort((a,b) => a.id - b.id);
+        activeFiltered = temp;
+        updateMasteryStats();
+        renderCurrentPage();
+    }
+
+    function renderCurrentPage() {
+        const items = activeFiltered.slice((currentPage-1)*10, currentPage*10);
+        const grid = document.getElementById('grid');
+        if (!items.length) { grid.innerHTML = '<div class="no-data">✨ No matching words.</div>'; document.getElementById('pagination').innerHTML = ''; return; }
+        grid.innerHTML = items.map(item => {
+            const isMarked = markedWords.includes(item.word);
+            const isLearned = learnedWords.includes(item.word);
+            const safe = item.word.replace(/'/g,"\\'");
+            return `<div class="card ${isMarked ? 'marked' : ''} ${isLearned ? 'learned' : ''}">
+                <div class="card-icons">
+                    <button class="icon-btn" onclick="toggleMastery('${safe}'); haptic();">${isLearned ? '✅' : '📘'}</button>
+                    <button class="icon-btn" onclick="toggleMark('${safe}'); haptic();">${isMarked ? '❤️' : '🤍'}</button>
                 </div>
-            `}).join('');
-            renderPag();
+                <span class="card-id">#${item.id} · ${item.pos}</span>
+                <div class="card-word">${item.word}</div>
+                <div class="card-bangla">${item.bangla}</div>
+                ${item.family && item.family !== "N/A" ? `<div class="card-family">📖 ${item.family}</div>` : ''}
+                <div class="card-example">“${item.example}”</div>
+                <div class="card-footer">
+                    <button class="action-icon btn-listen" onclick="speakWord('${safe}'); event.stopPropagation(); haptic();">🔊 Listen</button>
+                    <button class="action-icon btn-image" onclick="openGoogleImageSearch('${safe}'); event.stopPropagation(); haptic();">🖼️ Image</button>
+                    <button class="action-icon btn-translate" onclick="window.open('https://www.google.com/search?q=${encodeURIComponent(item.word)}+meaning+in+Bangla','_blank'); event.stopPropagation(); haptic();">🌐 Translate</button>
+                </div>
+            </div>`;
+        }).join('');
+        renderPagination(Math.ceil(activeFiltered.length/10));
+    }
+
+    function renderPagination(total) {
+        const pag = document.getElementById('pagination');
+        const jump = document.getElementById('jumpArea');
+        if (total <= 1) { pag.innerHTML = ''; jump.style.display = 'none'; return; }
+        jump.style.display = 'flex';
+        pag.innerHTML = '';
+        const btn = (p, l, act) => {
+            const b = document.createElement('button');
+            b.className = `p-btn ${act ? 'active' : ''}`;
+            b.innerText = l;
+            b.onclick = () => { currentPage = p; renderCurrentPage(); window.scrollTo({top:0}); haptic(); };
+            return b;
+        };
+        if (currentPage > 1) pag.appendChild(btn(currentPage-1, '←', false));
+        pag.appendChild(btn(1, '1', currentPage === 1));
+        if (currentPage > 3) pag.appendChild(document.createTextNode('...'));
+        let s = Math.max(2, currentPage-1), e = Math.min(total-1, currentPage+1);
+        for (let i = s; i <= e; i++) pag.appendChild(btn(i, i.toString(), i === currentPage));
+        if (currentPage < total-2) pag.appendChild(document.createTextNode('...'));
+        pag.appendChild(btn(total, total.toString(), currentPage === total));
+        if (currentPage < total) pag.appendChild(btn(currentPage+1, '→', false));
+    }
+
+    function jumpToPage() {
+        let v = parseInt(document.getElementById('jumpInput').value);
+        let t = Math.ceil(activeFiltered.length/10);
+        if (v >= 1 && v <= t) { currentPage = v; renderCurrentPage(); window.scrollTo({top:0}); haptic(); }
+    }
+
+    function toggleMark(word) {
+        if (markedWords.includes(word)) markedWords = markedWords.filter(w => w !== word);
+        else markedWords.push(word);
+        localStorage.setItem('hsc_marked_vFinal', JSON.stringify(markedWords));
+        updateHeaderStats();
+        processFiltersAndRender();
+        if (flashCurrent && flashCurrent.word === word) updateFlashMarkButton();
+        haptic();
+    }
+    
+    function toggleMastery(word) {
+        if (learnedWords.includes(word)) learnedWords = learnedWords.filter(w => w !== word);
+        else learnedWords.push(word);
+        localStorage.setItem('hsc_mastered_vFinal', JSON.stringify(learnedWords));
+        updateMasteryStats();
+        processFiltersAndRender();
+        haptic();
+    }
+
+    // ========== SMART CARDS ==========
+    function getRandomCards(count) {
+        if (!masterDataset.length) return [];
+        const shuffled = [...masterDataset];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
+        return shuffled.slice(0, Math.min(count, shuffled.length));
+    }
 
-        function renderPag() {
-            const totalPages = Math.ceil(filtered.length / perPage);
-            const nav = document.getElementById('pagination');
-            const jumpArea = document.getElementById('jumpArea');
-            nav.innerHTML = "";
-            
-            if (totalPages <= 1) { jumpArea.style.display = 'none'; return; }
-            jumpArea.style.display = 'flex';
+    function setCustomCardCount() {
+        let inputVal = parseInt(document.getElementById('customCardCount').value);
+        if (isNaN(inputVal)) inputVal = 20;
+        if (inputVal < 1) inputVal = 1;
+        if (masterDataset.length && inputVal > masterDataset.length) inputVal = masterDataset.length;
+        currentCardCount = inputVal;
+        document.getElementById('customCardCount').value = currentCardCount;
+        shuffleFlashSession();
+        haptic();
+    }
 
-            const createBtn = (p, label, active = false) => {
-                const b = document.createElement('button');
-                b.className = `p-btn ${active ? 'active' : ''}`;
-                b.innerText = label;
-                b.onclick = () => { page = p; render(); window.scrollTo({top:0, behavior:'smooth'}); };
-                return b;
-            };
-
-            if (page > 1) {
-                const prev = createBtn(page - 1, 'Prev');
-                prev.classList.add('nav-btn');
-                nav.appendChild(prev);
-            }
-
-            if (totalPages <= 5) {
-                for (let i = 1; i <= totalPages; i++) nav.appendChild(createBtn(i, i, i === page));
-            } else {
-                nav.appendChild(createBtn(1, 1, 1 === page));
-                if (page > 3) nav.appendChild(Object.assign(document.createElement('span'), {innerText:'...', style:'padding:0 5px;font-weight:bold'}));
-                
-                let start = Math.max(2, page - 1);
-                let end = Math.min(totalPages - 1, page + 1);
-                for (let i = start; i <= end; i++) nav.appendChild(createBtn(i, i, i === page));
-
-                if (page < totalPages - 2) nav.appendChild(Object.assign(document.createElement('span'), {innerText:'...', style:'padding:0 5px;font-weight:bold'}));
-                nav.appendChild(createBtn(totalPages, totalPages, totalPages === page));
-            }
-
-            if (page < totalPages) {
-                const next = createBtn(page + 1, 'Next');
-                next.classList.add('nav-btn');
-                nav.appendChild(next);
-            }
+    function scaleTextToFit() {
+        const wordEl = document.getElementById('f-word');
+        if (!wordEl) return;
+        const container = wordEl.parentElement;
+        if (!container) return;
+        const availableHeight = container.clientHeight - 80;
+        let fontSize = 36;
+        wordEl.style.fontSize = fontSize + 'px';
+        while (wordEl.scrollHeight > availableHeight && fontSize > 16) {
+            fontSize -= 2;
+            wordEl.style.fontSize = fontSize + 'px';
         }
+        if (wordEl.scrollHeight > availableHeight) wordEl.style.fontSize = '1rem';
+    }
 
-        function jumpToPage() {
-            const input = document.getElementById('jumpInput');
-            const val = parseInt(input.value);
-            const totalPages = Math.ceil(filtered.length / perPage);
-            if (val >= 1 && val <= totalPages) {
-                page = val; render(); window.scrollTo({top:0, behavior:'smooth'});
-                input.value = "";
-            } else { alert(`Enter 1 to ${totalPages}`); }
+    function openFlashcards() {
+        if (!masterDataset.length) return;
+        let count = parseInt(document.getElementById('customCardCount').value);
+        if (isNaN(count) || count < 1) count = 20;
+        if (count > masterDataset.length) count = masterDataset.length;
+        currentCardCount = count;
+        document.getElementById('customCardCount').value = currentCardCount;
+        flashSessionCards = getRandomCards(currentCardCount);
+        if (flashSessionCards.length === 0) return;
+        flashIndex = 0;
+        flashCurrent = flashSessionCards[0];
+        isFlippedState = false;
+        document.getElementById('flashModal').style.display = 'flex';
+        lockBodyScroll();
+        renderFlashUI();
+        updateFlashMarkButton();
+        updateFlashMasterButton();
+        updateFlashCounter();
+        if (autoSpeakEnabled) speakWord(flashCurrent.word);
+        setTimeout(() => scaleTextToFit(), 20);
+        hapticMedium();
+    }
+
+    function renderFlashUI() {
+        if (!flashCurrent) return;
+        const label = document.getElementById('f-label');
+        const wordSpan = document.getElementById('f-word');
+        const sub = document.getElementById('f-sub');
+        if (!isFlippedState) {
+            label.innerText = '📖 WORD';
+            wordSpan.innerText = flashCurrent.word;
+            sub.innerText = '👇 Tap to reveal meaning + example';
+        } else {
+            label.innerText = '🔤 BANGLA + EXAMPLE';
+            wordSpan.innerText = flashCurrent.bangla;
+            sub.innerText = `📌 ${flashCurrent.example.substring(0,80)}`;
         }
+        setTimeout(() => scaleTextToFit(), 20);
+    }
 
-        function toggleMark(w) {
-            if (marked.includes(w)) marked = marked.filter(x => x !== w);
-            else marked.push(w);
-            localStorage.setItem('marked_hsc_v7', JSON.stringify(marked));
-            render();
-            document.getElementById('totalStats').innerText = `${filtered.length} | ${marked.length} ❤️`;
-        }
+    function flipFlash() { if (flashCurrent) { isFlippedState = !isFlippedState; renderFlashUI(); haptic(); } }
+    
+    function nextFlash() {
+        if (!flashSessionCards.length) return;
+        if (flashIndex < flashSessionCards.length - 1) { flashIndex++; flashCurrent = flashSessionCards[flashIndex]; }
+        else { flashIndex = 0; flashCurrent = flashSessionCards[0]; }
+        isFlippedState = false;
+        renderFlashUI(); updateFlashMarkButton(); updateFlashMasterButton(); updateFlashCounter();
+        if (autoSpeakEnabled) speakWord(flashCurrent.word);
+        haptic();
+    }
+    
+    function previousFlash() {
+        if (!flashSessionCards.length) return;
+        if (flashIndex > 0) { flashIndex--; flashCurrent = flashSessionCards[flashIndex]; }
+        else { flashIndex = flashSessionCards.length - 1; flashCurrent = flashSessionCards[flashIndex]; }
+        isFlippedState = false;
+        renderFlashUI(); updateFlashMarkButton(); updateFlashMasterButton(); updateFlashCounter();
+        if (autoSpeakEnabled) speakWord(flashCurrent.word);
+        haptic();
+    }
+    
+    function shuffleFlashSession() {
+        if (!masterDataset.length) return;
+        flashSessionCards = getRandomCards(currentCardCount);
+        flashIndex = 0; flashCurrent = flashSessionCards[0]; isFlippedState = false;
+        renderFlashUI(); updateFlashMarkButton(); updateFlashMasterButton(); updateFlashCounter();
+        if (autoSpeakEnabled) speakWord(flashCurrent.word);
+        hapticMedium();
+    }
+    
+    function updateFlashCounter() { const c = document.getElementById('flashCounter'); if (c && flashSessionCards.length) c.innerText = `${flashIndex+1}/${flashSessionCards.length}`; }
+    function updateFlashMarkButton() { const btn = document.getElementById('flashMarkBtn'); if (btn && flashCurrent) btn.innerHTML = markedWords.includes(flashCurrent.word) ? '❤️' : '🤍'; }
+    function updateFlashMasterButton() { const btn = document.getElementById('flashMasterBtn'); if (btn && flashCurrent) { const isMastered = learnedWords.includes(flashCurrent.word); btn.innerHTML = isMastered ? '✅ Mastered ✓' : '✅ Mastered'; if (isMastered) btn.classList.add('active-mastered'); else btn.classList.remove('active-mastered'); } }
+    function toggleMarkFromFlash() { if (flashCurrent) { toggleMark(flashCurrent.word); updateFlashMarkButton(); haptic(); } }
+    function toggleMasteredFromFlash() { if (!flashCurrent) return; const word = flashCurrent.word; if (learnedWords.includes(word)) { learnedWords = learnedWords.filter(w => w !== word); haptic(); } else { learnedWords.push(word); hapticSuccess(); } localStorage.setItem('hsc_mastered_vFinal', JSON.stringify(learnedWords)); updateMasteryStats(); processFiltersAndRender(); updateFlashMasterButton(); haptic(); }
+    function speakFlash() { if (flashCurrent) { speakWord(flashCurrent.word); haptic(); } }
+    function toggleAutoSpeak() { autoSpeakEnabled = !autoSpeakEnabled; const btn = document.getElementById('autoSpeakToggle'); if (autoSpeakEnabled) { btn.classList.add('active'); btn.innerHTML = '🔊 Auto ON'; } else { btn.classList.remove('active'); btn.innerHTML = '🔇 Auto OFF'; } haptic(); }
+    
+    // ========== MCQ ARENA ==========
+    function openQuiz() { if (masterDataset.length < 5) return; initQuizSession(); document.getElementById('quizModal').style.display = 'flex'; lockBodyScroll(); loadQuizQuestion(); hapticMedium(); }
+    function initQuizSession() { currentQuizSet = [...masterDataset]; for (let i = currentQuizSet.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [currentQuizSet[i], currentQuizSet[j]] = [currentQuizSet[j], currentQuizSet[i]]; } quizQuestions = currentQuizSet.slice(0, 20); quizIndex = 0; quizTotalScore = 0; quizLocked = false; document.getElementById('quizFeedback').innerHTML = ''; document.getElementById('quizScore').innerHTML = 'Score: 0'; }
+    function resetCurrentQuiz() { if (quizQuestions.length) { initQuizSession(); loadQuizQuestion(); haptic(); } else openQuiz(); }
+    function loadQuizQuestion() { if (quizLocked) return; if (quizIndex >= quizQuestions.length) { const perfect = quizTotalScore === 20; const msg = perfect ? "🏆 PERFECT SCORE! Mastery unlocked!" : `🎉 Quiz Complete! Score: ${quizTotalScore}/20`; alert(msg); closeModal('quizModal'); return; } const q = quizQuestions[quizIndex]; document.getElementById('quizScore').innerHTML = `Score: ${quizTotalScore}`; document.getElementById('q-word').innerHTML = q.word; document.getElementById('quizProgressFill').style.width = (quizIndex / 20) * 100 + '%'; let options = [q.bangla]; while (options.length < 4) { const rand = masterDataset[Math.floor(Math.random() * masterDataset.length)].bangla; if (!options.includes(rand)) options.push(rand); } options.sort(() => Math.random() - 0.5); document.getElementById('q-options').innerHTML = options.map(opt => `<button class="quiz-option" onclick="checkQuizAnswer(this, '${q.bangla.replace(/'/g,"\\'")}', '${q.word.replace(/'/g,"\\'")}'); haptic();">${opt}</button>`).join(''); document.getElementById('quizFeedback').innerHTML = ''; }
+    window.checkQuizAnswer = (btn, correctMeaning, word) => { if (quizLocked) return; haptic(); quizLocked = true; const all = document.querySelectorAll('.quiz-option'); all.forEach(b => b.style.pointerEvents = 'none'); const isCorrect = btn.innerText === correctMeaning; if (isCorrect) { btn.classList.add('correct'); quizTotalScore++; document.getElementById('quizFeedback').innerHTML = `✅ Correct! "${word}" means "${correctMeaning}". +1 point!`; hapticSuccess(); } else { btn.classList.add('wrong'); all.forEach(b => { if (b.innerText === correctMeaning) b.classList.add('correct'); }); document.getElementById('quizFeedback').innerHTML = `❌ Oops! "${word}" means "${correctMeaning}". Keep practicing!`; hapticMedium(); } setTimeout(() => { quizIndex++; quizLocked = false; loadQuizQuestion(); }, 1400); };
 
-        function toggleFav() { onlyFav = !onlyFav; document.getElementById('favToggle').classList.toggle('active'); process(); }
-
-        function openFlashcard() { if(filtered.length === 0) return; document.getElementById('modal').style.display = 'flex'; nextFlash(); }
-        function closeFlashcard() { document.getElementById('modal').style.display = 'none'; }
-        function nextFlash() {
-            document.getElementById('flash').classList.remove('flipped');
-            const r = filtered[Math.floor(Math.random() * filtered.length)];
-            setTimeout(() => {
-                document.getElementById('f-word').innerText = r.word;
-                document.getElementById('f-bangla').innerText = r.bangla;
-                document.getElementById('f-example').innerText = r.example;
-            }, 200);
-        }
-
-        function speak(t) {
-            window.speechSynthesis.cancel();
-            const m = new SpeechSynthesisUtterance(t);
-            m.lang = 'en-US'; m.rate = 0.9;
-            window.speechSynthesis.speak(m);
-        }
-
-        function goHome() { window.scrollTo({top: 0, behavior: 'smooth'}); setTimeout(() => location.reload(), 300); }
-
-        init();
-    </script>
+    function adjustFont(d) { let s = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--f-scale')) || 1; s = Math.min(Math.max(s + d, 0.7), 1.7); document.documentElement.style.setProperty('--f-scale', s.toFixed(2)); haptic(); }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; unlockBodyScroll(); window.speechSynthesis.cancel(); quizLocked = false; haptic(); }
+    function toggleMenu() { document.getElementById('sideMenu').classList.toggle('active'); document.getElementById('menuOverlay').style.display = document.getElementById('sideMenu').classList.contains('active') ? 'block' : 'none'; haptic(); }
+    function resetAllData() { if (confirm('Reset all learned & marked words?')) { learnedWords = []; markedWords = []; localStorage.setItem('hsc_mastered_vFinal', JSON.stringify(learnedWords)); localStorage.setItem('hsc_marked_vFinal', JSON.stringify(markedWords)); updateMasteryStats(); updateHeaderStats(); processFiltersAndRender(); haptic(); } }
+    function updateHeaderStats() { document.getElementById('totalWordsCount').innerText = masterDataset.length; document.getElementById('markedWordsCount').innerText = markedWords.length; }
+    function updateScrollProgress() { const win = document.documentElement.scrollTop, h = document.documentElement.scrollHeight - document.documentElement.clientHeight; document.getElementById('scrollProgressFill').style.width = (win / h) * 100 + "%"; }
+    function updateMasteryStats() { let percent = masterDataset.length ? Math.floor((learnedWords.length / masterDataset.length) * 100) : 0; document.getElementById('masteryFill').style.width = percent + "%"; }
+    let debounceTimer; function debouncedProcess() { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => processFiltersAndRender(), 300); }
+    
+    window.addEventListener('DOMContentLoaded', () => { const toggleBtn = document.getElementById('autoSpeakToggle'); if (toggleBtn) { toggleBtn.classList.remove('active'); toggleBtn.innerHTML = '🔇 Auto OFF'; } });
+    fetchVocabulary();
+</script>
 </body>
 </html>
